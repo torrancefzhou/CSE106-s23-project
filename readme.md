@@ -1,5 +1,5 @@
 # Requirements
-flask
-flask-sqlalchemy
+- flask
+- flask-sqlalchemy
 # How to Run
 `flask run`
