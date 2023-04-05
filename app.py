@@ -10,7 +10,6 @@ from flask_admin.contrib.sqla import ModelView
 db = SQLAlchemy()
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///project.db"
-app.config['FLASK_ADMIN_SWATCH'] = 'cerulean'
 db.init_app(app)
 
 class Course(db.Model):
@@ -44,9 +43,11 @@ class Account(db.Model): # TODO: username, password, etc
     roleID = db.Column(db.Integer, nullable=False) # student with id#1, etc
 
 with app.app_context():
-    db.drop_all() # resets tables between instances
+    # db.drop_all() # resets tables between instances, do this if you change table models
     db.create_all()
 
+app.secret_key = 'change this later, you need this to run flask-admin'
+app.config['FLASK_ADMIN_SWATCH'] = 'cerulean'
 admin = Admin(app, name='gradebook', template_mode='bootstrap3')
 admin.add_view(ModelView(Course, db.session))
 admin.add_view(ModelView(Student, db.session))
