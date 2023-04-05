@@ -1,12 +1,16 @@
 from flask import Flask, render_template, request
 import json
 from flask_sqlalchemy import SQLAlchemy
-# will likely need flask-user, flask-admin
+
+from flask_admin import Admin
+from flask_admin.contrib.sqla import ModelView
+# will likely need flask-user, flask-login flask-admin
 # from sqlalchemy import exc # for specific errors, not sure if needed
 
 db = SQLAlchemy()
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///project.db"
+app.config['FLASK_ADMIN_SWATCH'] = 'cerulean'
 db.init_app(app)
 
 class Course(db.Model):
@@ -26,22 +30,28 @@ class Course(db.Model):
 # should Enrollment belong to Course or Student, or both?
 # probably more
 
-class Student():
+class Student(db.Model):
     id = db.Column(db.Integer, unique=True, primary_key=True, nullable=False)
     name = db.Column(db.String)
 
-class Instructor():
+class Instructor(db.Model):
     id = db.Column(db.Integer, unique=True, primary_key=True, nullable=False)
     name = db.Column(db.String)
 
-class Account(): # TODO: username, password, etc
+class Account(db.Model): # TODO: username, password, etc
     id = db.Column(db.Integer, unique=True, primary_key=True, nullable=False)
-    type = db.Column(db.Character, nullable=False) # 's'tudent, 'i'nstructor, 'a'dmin
+    type = db.Column(db.String(1), nullable=False) # 's'tudent, 'i'nstructor, 'a'dmin
     roleID = db.Column(db.Integer, nullable=False) # student with id#1, etc
 
 with app.app_context():
     db.drop_all() # resets tables between instances
     db.create_all()
+
+admin = Admin(app, name='gradebook', template_mode='bootstrap3')
+admin.add_view(ModelView(Course, db.session))
+admin.add_view(ModelView(Student, db.session))
+admin.add_view(ModelView(Instructor, db.session))
+admin.add_view(ModelView(Account, db.session))
 
 @app.get("/")
 def index():
