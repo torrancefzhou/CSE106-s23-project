@@ -55,7 +55,7 @@ with app.app_context():
 
 class MyModelView(sqla.ModelView):
     def is_accessible(self):
-        return current_user.is_admin
+        return current_user.get_id() and current_user.is_admin
 
     def inaccessible_callback(self, name, **kwargs):
         # redirect to login page if user doesn't have access
@@ -80,7 +80,7 @@ def load_user(user_id):
 @login_required
 def index(): # put application's code here
     if current_user.is_admin:
-        return render_template('gradebook-home.html')
+        return render_template('gradebook_home.html')
     elif current_user.is_teacher:
         return render_template('teacher_home.html')
     else:
