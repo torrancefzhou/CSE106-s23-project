@@ -7,56 +7,8 @@
     <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/1950/1950715.png">
     <!-- TODO: replace this with a static image (currently it's hotlinked) -->
     <style>
-        body {
-            background-color: rgba(52, 165, 231, 0.423);
-        }
-        .big-title {
-            font-size: 40px;
-            font-weight: bold;
-            text-align: center;
-        }
 
-        .box {
-            text-align: center;
-            background-color: white;
-            margin-top: 50px;
-            margin-left: 100px;
-            margin-right: 100px;
-            border: 5px solid black;
-        }
-
-        ul {
-            list-style-type: none;
-            margin: 0;
-            padding: 0;
-            overflow: hidden;
-            background-color: rgb(52, 165, 231);
-        }
-
-        li {
-            float:left;
-        }
-
-        li a {
-            display: block;
-            color: black;
-            text-align: center;
-            padding: 14px 16px;
-            text-decoration: none;
-            font-size: 20px;
-            font-weight: bold;
-        }
-
-        /* Change the link color to #111 (black) on hover */
-        li a:hover {
-            background-color:beige;
-        }
-
-        .active {
-            background-color: rgb(0, 136, 77);
-        }
-
-        #customers {
+        #classTable {
             font-family: Arial, Helvetica, sans-serif;
             border-collapse: collapse;
             width: 90%;
@@ -66,16 +18,16 @@
             margin-right: 5%;
         }
 
-        #customers td, #customers th {
+        #classTable td, #classTable th {
             border: 1px solid #ddd;
             padding: 8px;
         }
 
-        #customers tr:nth-child(even){background-color: #f2f2f2;}
+        #classTable tr:nth-child(even){background-color: #f2f2f2;}
 
-        #customers tr:hover {background-color: #ddd;}
+        #classTable tr:hover {background-color: #ddd;}
 
-        #customers th {
+        #classTable th {
             padding-top: 12px;
             padding-bottom: 12px;
             text-align: left;
@@ -86,47 +38,34 @@
 </head>
 
 <body>
-    <h1 class="big-title">University of California, Massachusetts</h1>
+    <table style="width:100%; height:100px">
+        <tr>
+            <td style="text-align:center; width:25%">
+                <h1 class="little-title">
+                {% if current_user.is_authenticated %}
+                    Welcome {{ current_user.name }}!
+                {% endif %}
+                </h1>
+            </td>
+            <td style="text-align:center; width:50%"><h1 class="big-title">University of California, Massachusetts</h1></td>
+            <td style="text-align:center; width:25%">
+                <form action="/logout">
+                <button type="submit">Log out</button>
+                </form>
+            </td>
+        </tr>
+    </table>
+
     <script src="{{ url_for('static',filename='script.js') }}"></script>
-    <form action="/logout">
-        <div class="box">
-            <button type="submit">Log out</button>
-            </div>
-        </div>
-    </form>
+
 
     <div class="box">
         <ul>
-            <li><a href="#" class="active">Enrolled Courses</a></li>
-            <li><a href="#">Add Courses</a></li>
+            <li style="width:50%"><a onclick="getClasses()" class="active">Enrolled Courses</a></li>
+            <li style="width:50%"><a onclick="allCourses()">Add Courses</a></li>
         </ul>
 
-        <table id="customers">
-            <tr>
-              <th>Course Name</th>
-              <th>Teacher</th>
-              <th>Time</th>
-              <th>Students Enrolled</th>
-            </tr>
-            <tr>
-              <td>CSE 1</td>
-              <td>Hepworth</td>
-              <td>TR 11:00-11:50 AM</td>
-              <td>5/10</td>
-            </tr>
-            <tr>
-                <td>CSE 2</td>
-                <td>Bob</td>
-                <td>MWF 11:00-11:50 AM</td>
-                <td>2/10</td>
-            </tr>
-            <tr>
-                <td>CSE 3</td>
-                <td>Joebery</td>
-                <td>TW 11:00-11:50 AM</td>
-                <td>7/10</td>
-            </tr>
-          </table>
+        <div id="placeholder"></div>
     </div>
     <script>
         // run functions here

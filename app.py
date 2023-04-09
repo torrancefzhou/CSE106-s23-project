@@ -1,4 +1,4 @@
-from flask import Flask, redirect, url_for, request, render_template
+from flask import Flask, redirect, url_for, request, render_template, jsonify
 from flask_admin import Admin
 from flask_sqlalchemy import SQLAlchemy
 from flask_admin.contrib import sqla
@@ -11,6 +11,7 @@ app = Flask(__name__)
 app.config['FLASK_ADMIN_SWATCH'] = 'cerulean'
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///example.sqlite"
 app.secret_key = 'super secret key'
+app.app_context().push()
 db = SQLAlchemy(app)
 
 
@@ -23,19 +24,10 @@ class Account(UserMixin, db.Model):
     is_admin = db.Column(db.Boolean, nullable=False)
 
     def __repr__(self):
-        return '<User %r>' % self.username
+        return '<Account %r>' % self.username
 
     def check_password(self, password):
         return self.password == password
-
-
-class Instructor(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String, nullable=False)
-    instructor = db.relationship('Courses', backref=db.backref('classes', lazy=True))
-
-    def __repr__(self):
-        return '<Category %r>' % self.name
 
 
 class Courses(db.Model):
@@ -43,18 +35,18 @@ class Courses(db.Model):
     name = db.Column(db.String) # e.g. "CSE 100"
     time = db.Column(db.String) # e.g. "TR 3:00PM - 4:15PM"
     currentEnrollment = db.Column(db.Integer) # e.g. 4 (/10)
-    maxEnrollment = db.Column(db.Integer) # e.g. 10 (4/)
-    instructor_id = db.Column(db.Integer, db.ForeignKey('instructor.id'), nullable=False) # e.g. "1001"
+    maxEnrollment = db.Column(db.Integer) # e.g. (4/) 10
+    instructor_id = db.Column(db.Integer, db.ForeignKey('account.id'), nullable=False) # e.g. "1001"
 
     def __repr__(self):
-        return '<Category %r>' % self.name
+        return '<Course %r>' % self.name
 
 
-enrollment = db.Table('enrollment',
-    db.Column('student_id', db.Integer, db.ForeignKey('account.id'), primary_key=True),
-    db.Column('course_id', db.Integer, db.ForeignKey('courses.id'), primary_key=True),
-    db.Column('grade', db.Integer, nullable=False)
-)
+class Grades(db.Model):
+    id = db.Column(db.Integer, unique=True, primary_key=True, nullable=False)
+    student_id = db.Column(db.Integer, db.ForeignKey('account.id'), nullable=False)
+    class_id = db.Column(db.Integer, db.ForeignKey('courses.id'), nullable=False)
+    grade = db.Column(db.Integer)
 
 
 with app.app_context():
@@ -73,7 +65,7 @@ class MyModelView(sqla.ModelView):
 admin = Admin(app, name='gradebook', template_mode='bootstrap3')
 admin.add_view(MyModelView(Account, db.session))
 admin.add_view(MyModelView(Courses, db.session))
-admin.add_view(MyModelView(Instructor, db.session))
+admin.add_view(MyModelView(Grades, db.session))
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -93,6 +85,53 @@ def index(): # put application's code here
         return render_template('teacher_home.html')
     else:
         return render_template('index.html')
+
+@app.route('/home')
+def home():
+    data = Courses.query.all()
+    return jsonify([{"name": item.name, "time": item.time, "currentEnrollment": item.currentEnrollment, "maxEnrollment": item.maxEnrollment} for item in data])
+
+@app.route('/class', methods=['GET'])
+@login_required
+def getClass():
+    if current_user.is_teacher:
+        data = Courses.query.filter_by(instructor_id=current_user.id).all()
+        teacher = Account.query.filter_by(id=data.instructor_id)
+        return jsonify([{"name": item.name,
+                     "instructor": teacher.name,
+                     "time": item.time,
+                     "currentEnrollment": item.currentEnrollment,
+                     "maxEnrollment": item.maxEnrollment} for item in data])
+    else:
+        classid = Grades.query.filter_by(student_id=current_user.id).all()
+        data = Account.query.filter_by(username='missing').all()
+        teacher = Account.query.filter_by(username='missing').all()
+        for x in classid:
+            temp = Courses.query.filter_by(id=x.class_id).first()
+            tempteach = (Account.query.filter_by(id=temp.instructor_id).first()).name
+            data.append(temp)
+            teacher.append(tempteach)
+
+        return jsonify([{"name": item.name,
+                     "instructor": teacher,
+                     "time": item.time,
+                     "currentEnrollment": item.currentEnrollment,
+                     "maxEnrollment": item.maxEnrollment} for item in data])
+
+@app.route('/classes', methods=['GET'])
+@login_required
+def getAllClass():
+    data = Courses.query.all()
+    teacher = Account.query.filter_by(username='missing').all()
+    for x in data:
+        tempteach = (Account.query.filter_by(id=x.instructor_id).first()).name
+        teacher.append(tempteach)
+
+    return jsonify([{"name": item.name,
+                     "instructor": teacher,
+                     "time": item.time,
+                     "currentEnrollment": item.currentEnrollment,
+                     "maxEnrollment": item.maxEnrollment} for item in data])
 
 @app.route('/login')
 def login_page():
@@ -125,7 +164,7 @@ def classTable(user):
     if user.is_teacher:
         return user.classes
     else:
-        return enrollment.query.filter_by(student_id=user.id).all()
+        return Grades.query.filter_by(student_id=user.id).all()
 
 if __name__ == "__main__":
     app.run()
