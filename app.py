@@ -156,7 +156,7 @@ def logout():
 @app.route("/book")
 @login_required
 def indexfull():
-    return render_template('gradebook-home.html')
+    return render_template('gradebook_home.html')
 
 @app.route("/class/<user>")
 @login_required
