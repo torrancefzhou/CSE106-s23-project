@@ -2,13 +2,13 @@
 <html>
 
 <head>
-    <link rel="stylesheet" href="static/styles.css">
+    <link rel="stylesheet" href="static/style.css">
     <title>Gradebook</title>
     <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/1950/1950715.png">
     <!-- TODO: replace this with a static image (currently it's hotlinked) -->
     <style>
 
-        #customers {
+        #classTable {
             font-family: Arial, Helvetica, sans-serif;
             border-collapse: collapse;
             width: 90%;
@@ -18,16 +18,16 @@
             margin-right: 5%;
         }
 
-        #customers td, #customers th {
+        #classTable td, #classTable th {
             border: 1px solid #ddd;
             padding: 8px;
         }
 
-        #customers tr:nth-child(even){background-color: #f2f2f2;}
+        #classTable tr:nth-child(even){background-color: #f2f2f2;}
 
-        #customers tr:hover {background-color: #ddd;}
+        #classTable tr:hover {background-color: #ddd;}
 
-        #customers th {
+        #classTable th {
             padding-top: 12px;
             padding-bottom: 12px;
             text-align: left;
@@ -43,7 +43,7 @@
             <td style="text-align:center; width:25%">
                 <h1 class="little-title">
                 {% if current_user.is_authenticated %}
-                    Welcome Mr. {{ current_user.name }}!
+                    Welcome {{ current_user.name }}!
                 {% endif %}
                 </h1>
             </td>
@@ -61,36 +61,10 @@
 
     <div class="box">
         <ul>
-            <li  style="width:50%"><a href="http://localhost:5000/index" class="active">Enrolled Courses</a></li>
-            <li  style="width:50%"><a href="http://localhost:5000/book" >Add Courses</a></li>
+            <li style="width:100%"><a id="header" onclick="getTeacherClasses()">Your Courses</a></li>
         </ul>
 
-        <table id="customers">
-            <tr>
-              <th>Course Name</th>
-              <th>Teacher</th>
-              <th>Time</th>
-              <th>Students Enrolled</th>
-            </tr>
-            <tr>
-              <td>CSE 1</td>
-              <td>Hepworth</td>
-              <td>TR 11:00-11:50 AM</td>
-              <td>5/10</td>
-            </tr>
-            <tr>
-                <td>CSE 2</td>
-                <td>Bob</td>
-                <td>MWF 11:00-11:50 AM</td>
-                <td>2/10</td>
-            </tr>
-            <tr>
-                <td>CSE 3</td>
-                <td>Joebery</td>
-                <td>TW 11:00-11:50 AM</td>
-                <td>7/10</td>
-            </tr>
-          </table>
+        <div id="placeholder"></div>
     </div>
     <script>
         // run functions here

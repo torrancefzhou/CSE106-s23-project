@@ -2,12 +2,11 @@
 <html>
 
 <head>
-    <link rel="stylesheet" href="static/styles.css">
+    <link rel="stylesheet" href="static/style.css">
     <title>Gradebook</title>
     <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/1950/1950715.png">
     <!-- TODO: replace this with a static image (currently it's hotlinked) -->
     <style>
-
         #classTable {
             font-family: Arial, Helvetica, sans-serif;
             border-collapse: collapse;
@@ -61,8 +60,8 @@
 
     <div class="box">
         <ul>
-            <li style="width:50%"><a onclick="getClasses()" class="active">Enrolled Courses</a></li>
-            <li style="width:50%"><a onclick="allCourses()">Add Courses</a></li>
+            <li style="width:50%"><a onclick="getStudentClasses()" class="active">Enrolled Courses</a></li>
+            <li style="width:50%"><a onclick="allClasses()">Add Courses</a></li>
         </ul>
 
         <div id="placeholder"></div>

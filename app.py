@@ -5,6 +5,8 @@ from flask_admin.contrib import sqla
 from flask_admin.contrib.sqla import ModelView
 from flask_login import current_user, login_user, login_required, LoginManager, UserMixin, logout_user
 
+from sqlalchemy import inspect
+
 app = Flask(__name__)
 
 # set optional bootswatch theme
@@ -23,6 +25,9 @@ class Account(UserMixin, db.Model):
     is_teacher = db.Column(db.Boolean, nullable=False)
     is_admin = db.Column(db.Boolean, nullable=False)
 
+    teaching = db.relationship('Courses', backref='account')
+    enrollment = db.relationship('Grades', backref='account')
+
     def __repr__(self):
         return '<Account %r>' % self.username
 
@@ -37,6 +42,9 @@ class Courses(db.Model):
     currentEnrollment = db.Column(db.Integer) # e.g. 4 (/10)
     maxEnrollment = db.Column(db.Integer) # e.g. (4/) 10
     instructor_id = db.Column(db.Integer, db.ForeignKey('account.id'), nullable=False) # e.g. "1001"
+    #instructor = db.relationship('Account', backref=db.backref('teacher', lazy=True))
+
+    grades = db.relationship('Grades', backref='courses')
 
     def __repr__(self):
         return '<Course %r>' % self.name
@@ -53,8 +61,39 @@ with app.app_context():
     # db.drop_all() # resets tables between instances, do this if you change table models
     db.create_all()
 
-class MyModelView(sqla.ModelView):
+
+class AccountModelView(sqla.ModelView):
+    column_hide_backrefs = False
+    column_list = [c_attr.key for c_attr in inspect(Account).mapper.column_attrs]
+
     def is_accessible(self):
+        return True  # to make new account after resetting DB
+        return current_user.get_id() and current_user.is_admin
+
+    def inaccessible_callback(self, name, **kwargs):
+        # redirect to login page if user doesn't have access
+        return redirect(url_for('login', next=request.url))
+
+
+class CourseModelView(sqla.ModelView):
+    column_hide_backrefs = False
+    column_list = [c_attr.key for c_attr in inspect(Courses).mapper.column_attrs]
+
+    def is_accessible(self):
+        return True  # to make new account after resetting DB
+        return current_user.get_id() and current_user.is_admin
+
+    def inaccessible_callback(self, name, **kwargs):
+        # redirect to login page if user doesn't have access
+        return redirect(url_for('login', next=request.url))
+
+
+class GradeModelView(sqla.ModelView):
+    column_hide_backrefs = False
+    column_list = [c_attr.key for c_attr in inspect(Grades).mapper.column_attrs]
+
+    def is_accessible(self):
+        return True  # to make new account after resetting DB
         return current_user.get_id() and current_user.is_admin
 
     def inaccessible_callback(self, name, **kwargs):
@@ -63,9 +102,9 @@ class MyModelView(sqla.ModelView):
 
 
 admin = Admin(app, name='gradebook', template_mode='bootstrap3')
-admin.add_view(MyModelView(Account, db.session))
-admin.add_view(MyModelView(Courses, db.session))
-admin.add_view(MyModelView(Grades, db.session))
+admin.add_view(AccountModelView(Account, db.session))
+admin.add_view(CourseModelView(Courses, db.session))
+admin.add_view(GradeModelView(Grades, db.session))
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -80,58 +119,11 @@ def load_user(user_id):
 @login_required
 def index(): # put application's code here
     if current_user.is_admin:
-        return render_template('gradebook_home.html')
+        return render_template('teacher_index.html')
     elif current_user.is_teacher:
-        return render_template('teacher_home.html')
+        return render_template('teacher_index.html')
     else:
         return render_template('index.html')
-
-@app.route('/home')
-def home():
-    data = Courses.query.all()
-    return jsonify([{"name": item.name, "time": item.time, "currentEnrollment": item.currentEnrollment, "maxEnrollment": item.maxEnrollment} for item in data])
-
-@app.route('/class', methods=['GET'])
-@login_required
-def getClass():
-    if current_user.is_teacher:
-        data = Courses.query.filter_by(instructor_id=current_user.id).all()
-        teacher = Account.query.filter_by(id=data.instructor_id)
-        return jsonify([{"name": item.name,
-                     "instructor": teacher.name,
-                     "time": item.time,
-                     "currentEnrollment": item.currentEnrollment,
-                     "maxEnrollment": item.maxEnrollment} for item in data])
-    else:
-        classid = Grades.query.filter_by(student_id=current_user.id).all()
-        data = Account.query.filter_by(username='missing').all()
-        teacher = Account.query.filter_by(username='missing').all()
-        for x in classid:
-            temp = Courses.query.filter_by(id=x.class_id).first()
-            tempteach = (Account.query.filter_by(id=temp.instructor_id).first()).name
-            data.append(temp)
-            teacher.append(tempteach)
-
-        return jsonify([{"name": item.name,
-                     "instructor": teacher,
-                     "time": item.time,
-                     "currentEnrollment": item.currentEnrollment,
-                     "maxEnrollment": item.maxEnrollment} for item in data])
-
-@app.route('/classes', methods=['GET'])
-@login_required
-def getAllClass():
-    data = Courses.query.all()
-    teacher = Account.query.filter_by(username='missing').all()
-    for x in data:
-        tempteach = (Account.query.filter_by(id=x.instructor_id).first()).name
-        teacher.append(tempteach)
-
-    return jsonify([{"name": item.name,
-                     "instructor": teacher,
-                     "time": item.time,
-                     "currentEnrollment": item.currentEnrollment,
-                     "maxEnrollment": item.maxEnrollment} for item in data])
 
 @app.route('/login')
 def login_page():
@@ -147,25 +139,75 @@ def login():
     login_user(user)
     return redirect(url_for('index'))
 
+@app.route('/class', methods=['GET'])
+@login_required
+def getClass():
+    if current_user.is_teacher:
+        data = Courses.query.filter_by(instructor_id=current_user.id).all()
+        #teacher = Account.query.filter_by(id=data.instructor_id)
+        return jsonify([{"name": item.name,
+                     "instructor": current_user.name,
+                     "time": item.time,
+                     "currentEnrollment": item.currentEnrollment,
+                     "maxEnrollment": item.maxEnrollment} for item in data])
+    else:
+        classid = Grades.query.filter_by(student_id=current_user.id).all()
+        data = Account.query.filter_by(username='missing').all()
+        for x in classid:
+            temp = Courses.query.filter_by(id=x.class_id).first()
+            data.append(temp)
+
+        return jsonify([{"name": item.name,
+                     "instructor": (Account.query.filter_by(id=item.instructor_id).first()).name,
+                     "time": item.time,
+                     "currentEnrollment": item.currentEnrollment,
+                     "maxEnrollment": item.maxEnrollment} for item in data])
+
+@app.route('/classes', methods=['GET'])
+@login_required
+def getAllClass():
+    data = Courses.query.all()
+
+    return jsonify([{"name": item.name,
+                     "instructor": (Account.query.filter_by(id=item.instructor_id).first()).name,
+                     "time": item.time,
+                     "currentEnrollment": item.currentEnrollment,
+                     "maxEnrollment": item.maxEnrollment} for item in data])
+
+@app.route("/classes/<course>", methods=['GET'])
+@login_required
+def getGrade(course):
+    temp = Courses.query.filter_by(name=course).first()
+    data = Grades.query.filter_by(class_id=temp.id).all()
+    return jsonify([{#"student": (Account.query.filter_by(id=item.student_id).first()).name,
+                     "student": item.student_id,
+                     "grade": item.grade} for item in data])
+
+@app.route("/classes/<course>", methods=['PUT'])
+@login_required
+def editGrade(course, body):
+    classid = (Courses.query.filter_by(name=course).first()).id
+    classgrades = Grades.query.filter_by(class_id=classid).all()
+    studentid = (Account.query.filter_by(name=body.name).first()).id
+    studentgrade = classgrades.query.filter_by(student_id=studentid).first()
+    studentgrade.grade = body.grade
+    return
+
+#@app.route("/classes/<course>", methods=['DELETE'])
+#@login_required
+#def deleteGrade(course):
+#    classid = Courses.query.filter_by(name=course).first()
+#    classgrades = Grades.query.filter_by(class_id=classid.id).all()
+#    studentid = body.name
+#    classgrades.query.filter_by(student_id=studentid).delete()
+#    return
+
 @app.route("/logout")
 @login_required
 def logout():
     logout_user()
     return redirect('login')
 
-@app.route("/book")
-@login_required
-def indexfull():
-    return render_template('gradebook_home.html')
-
-@app.route("/class/<user>")
-@login_required
-def classTable(user):
-    if user.is_teacher:
-        return user.classes
-    else:
-        return Grades.query.filter_by(student_id=user.id).all()
 
 if __name__ == "__main__":
     app.run()
-
