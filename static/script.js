@@ -41,7 +41,7 @@ function getTeacherClasses() {
 
       for (var i = 0; i < data.length; i++) {
           classname = data[i].name;
-        table += "<tr><td onclick='seeGrades(classname)'>" + classname + "</td>";
+        table += "<tr><td onclick='seeGrades(\"" + classname + "\")'>" + classname + "</td>";
         table += "<td>" + data[i].instructor + "</td>";
         table += "<td>" + data[i].time + "</td>";
         table += "<td>" + data[i].currentEnrollment + "/" + data[i].maxEnrollment + "</td></tr>";
@@ -73,14 +73,24 @@ function allClasses() {
         if (data[i].currentEnrollment == data[i].maxEnrollment){
             table += "<td>" + "Not available" + "</td></tr>";
         }
+        else if ((checkEnrollment(data[i].name)) == "True"){
+            table += "<td onclick='studentDropClass(\"" + data[i].name + "\")'>" + "Drop Class" + "</td></tr>"
+        }
         else{
-            table += "<td>" + "Add Class" + "</td></tr>"
+            table += "<td onclick='studentAddClass(\"" + data[i].name + "\")'>" + "Add Class" + "</td></tr>"
         }
       }
 
       document.getElementById("placeholder").innerHTML = table;
     };
     xhttp.send();
+}
+
+function checkEnrollment(course) {
+    var xhttp = new XMLHttpRequest();
+    xhttp.open("GET", "http://localhost:5000/class/" + course);
+    xhttp.send();
+    return this.responseText;
 }
 
 function seeGrades(course) {
@@ -93,7 +103,7 @@ function seeGrades(course) {
                "<th>Grade</th></tr>";
 
       for (var i = 0; i < data.length; i++) {
-        table += "<tr><td>" + data[i].name + "</td>";
+        table += "<tr><td>" + data[i].student + "</td>";
         table += "<td>" + data[i].grade + "</td></tr>";
       }
 
@@ -131,4 +141,22 @@ function deleteGrades(course, student) {
       document.getElementById("placeholder").innerHTML = table;
     };
     xhttp.send();
+}
+
+function studentAddClass(course) {
+    var xhttp = new XMLHttpRequest();
+    xhttp.open("POST", "http://localhost:5000/classes/" + course);
+    xhttp.send();
+    xhttp.onload = function() {
+        document.getElementById("placeholder").innerHTML = "Enrolled in " + this.responseText;
+    };
+}
+
+function studentDropClass(course) {
+    var xhttp = new XMLHttpRequest();
+    xhttp.open("DELETE", "http://localhost:5000/classes/" + course);
+    xhttp.send();
+    xhttp.onload = function() {
+        document.getElementById("placeholder").innerHTML = "Unenrolled from " + this.responseText;
+    };
 }

@@ -174,13 +174,24 @@ def getAllClass():
                      "currentEnrollment": item.currentEnrollment,
                      "maxEnrollment": item.maxEnrollment} for item in data])
 
+
+@app.route("/class/<course>", methods=['GET'])
+@login_required
+def inClass(course):
+    classid = (Courses.query.filter_by(name=course).first()).id
+    studentgrades = Grades.query.filter_by(class_id=classid, student_id=current_user.id).all()
+    if (studentgrades is None):
+        return "False"
+    else:
+        return "True"
+
+
 @app.route("/classes/<course>", methods=['GET'])
 @login_required
 def getGrade(course):
     temp = Courses.query.filter_by(name=course).first()
     data = Grades.query.filter_by(class_id=temp.id).all()
-    return jsonify([{#"student": (Account.query.filter_by(id=item.student_id).first()).name,
-                     "student": item.student_id,
+    return jsonify([{"student": (Account.query.filter_by(id=item.student_id).first()).name,
                      "grade": item.grade} for item in data])
 
 @app.route("/classes/<course>", methods=['PUT'])
@@ -193,14 +204,27 @@ def editGrade(course, body):
     studentgrade.grade = body.grade
     return
 
-#@app.route("/classes/<course>", methods=['DELETE'])
-#@login_required
-#def deleteGrade(course):
-#    classid = Courses.query.filter_by(name=course).first()
-#    classgrades = Grades.query.filter_by(class_id=classid.id).all()
-#    studentid = body.name
-#    classgrades.query.filter_by(student_id=studentid).delete()
-#    return
+@app.route("/classes/<course>", methods=['POST'])
+@login_required
+def addStudent(course):
+    newStudent = Grades(student_id=current_user.id,
+                     class_id=(Courses.query.filter_by(name=course).first()).id,
+                     grade=0)
+    (Courses.query.filter_by(name=course).first()).currentEnrollment = (Courses.query.filter_by(name=course).first()).currentEnrollment + 1
+    db.session.add(newStudent)
+    db.session.commit()
+    return course
+
+@app.route("/classes/<course>", methods=['DELETE'])
+@login_required
+def dropStudent(course):
+    classid = (Courses.query.filter_by(name=course).first()).id
+    classGrades = Grades.query.filter_by(class_id=classid).all()
+    classGrades.query.filter_by(student_id=current_user.id).delete()
+    (Courses.query.filter_by(name=course).first()).currentEnrollment = (Courses.query.filter_by(
+        name=course).first()).currentEnrollment - 1
+    db.session.commit()
+    return course
 
 @app.route("/logout")
 @login_required
