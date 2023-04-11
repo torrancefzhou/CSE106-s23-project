@@ -66,11 +66,11 @@ function allClasses() {
         table += "<td>" + data[i].instructor + "</td>";
         table += "<td>" + data[i].time + "</td>";
         table += "<td>" + data[i].currentEnrollment + "/" + data[i].maxEnrollment + "</td>";
-        if (data[i].currentEnrollment == data[i].maxEnrollment){
-            table += "<td>" + "Not available" + "</td></tr>";
+        if (data[i].enrolled){
+          table += "<td><button onclick='dropCourse(\"" + data[i].name + "\")'>" + "Drop Class" + "</button></td></tr>"
         }
-        else if (data[i].enrolled){
-            table += "<td><button onclick='dropCourse(\"" + data[i].name + "\")'>" + "Drop Class" + "</button></td></tr>"
+        else if (data[i].currentEnrollment >= data[i].maxEnrollment){
+            table += "<td>" + "Not available" + "</td></tr>";
         }
         else{
             table += "<td><button onclick='studentAddClass(\"" + data[i].name + "\")'>" + "Add Class" + "</button></td></tr>"
