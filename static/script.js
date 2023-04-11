@@ -69,8 +69,8 @@ function allClasses() {
         if (data[i].currentEnrollment == data[i].maxEnrollment){
             table += "<td>" + "Not available" + "</td></tr>";
         }
-        else if ((checkEnrollment(data[i].name)) == "True"){
-            table += "<td><button onclick='studentDropClass(\"" + data[i].name + "\")'>" + "Drop Class" + "</button></td></tr>"
+        else if (data[i].enrolled){
+            table += "<td><button onclick='dropCourse(\"" + data[i].name + "\")'>" + "Drop Class" + "</button></td></tr>"
         }
         else{
             table += "<td><button onclick='studentAddClass(\"" + data[i].name + "\")'>" + "Add Class" + "</button></td></tr>"

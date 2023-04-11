@@ -168,12 +168,12 @@ def getClass():
 @login_required
 def getAllClass():
     data = Courses.query.all()
-
     return jsonify([{"name": item.name,
                      "instructor": (Account.query.filter_by(id=item.instructor_id).first()).name,
                      "time": item.time,
                      "currentEnrollment": item.currentEnrollment,
-                     "maxEnrollment": item.maxEnrollment} for item in data])
+                     "maxEnrollment": item.maxEnrollment,
+                     "enrolled": Grades.query.filter_by(class_id=item.id, student_id=current_user.id).count() > 0} for item in data])
 
 
 @app.route("/class/<course>", methods=['GET'])
