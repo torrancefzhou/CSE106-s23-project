@@ -25,8 +25,6 @@ class Account(UserMixin, db.Model):
     is_teacher = db.Column(db.Boolean, nullable=False)
     is_admin = db.Column(db.Boolean, nullable=False)
 
-    teaching = db.relationship('Courses', backref='account')
-    enrollment = db.relationship('Grades', backref='account')
 
     def __repr__(self):
         return '<Account %r>' % self.username
@@ -43,8 +41,6 @@ class Courses(db.Model):
     maxEnrollment = db.Column(db.Integer) # e.g. (4/) 10
     instructor_id = db.Column(db.Integer, db.ForeignKey('account.id'), nullable=False) # e.g. "1001"
     #instructor = db.relationship('Account', backref=db.backref('teacher', lazy=True))
-
-    grades = db.relationship('Grades', backref='courses')
 
     def __repr__(self):
         return '<Course %r>' % self.name
@@ -64,10 +60,10 @@ with app.app_context():
 
 class AccountModelView(sqla.ModelView):
     column_hide_backrefs = False
-    column_list = [c_attr.key for c_attr in inspect(Account).mapper.column_attrs]
+    column_list = ['id', 'username', 'name', 'is_teacher', 'is_admin']
 
     def is_accessible(self):
-        return True  # to make new account after resetting DB
+        #return True  # to make new account after resetting DB
         return current_user.get_id() and current_user.is_admin
 
     def inaccessible_callback(self, name, **kwargs):
@@ -80,7 +76,7 @@ class CourseModelView(sqla.ModelView):
     column_list = [c_attr.key for c_attr in inspect(Courses).mapper.column_attrs]
 
     def is_accessible(self):
-        return True  # to make new account after resetting DB
+        #return True  # to make new account after resetting DB
         return current_user.get_id() and current_user.is_admin
 
     def inaccessible_callback(self, name, **kwargs):
@@ -93,7 +89,7 @@ class GradeModelView(sqla.ModelView):
     column_list = [c_attr.key for c_attr in inspect(Grades).mapper.column_attrs]
 
     def is_accessible(self):
-        return True  # to make new account after resetting DB
+        #return True  # to make new account after resetting DB
         return current_user.get_id() and current_user.is_admin
 
     def inaccessible_callback(self, name, **kwargs):
@@ -119,7 +115,7 @@ def load_user(user_id):
 @login_required
 def index(): # put application's code here
     if current_user.is_admin:
-        return render_template('teacher_index.html')
+        return render_template('admin_index.html')
     elif current_user.is_teacher:
         return render_template('teacher_index.html')
     else:
@@ -196,35 +192,53 @@ def getGrade(course):
 
 @app.route("/classes/<course>", methods=['PUT'])
 @login_required
-def editGrade(course, body):
+def editGrade(course):
     classid = (Courses.query.filter_by(name=course).first()).id
     classgrades = Grades.query.filter_by(class_id=classid).all()
-    studentid = (Account.query.filter_by(name=body.name).first()).id
-    studentgrade = classgrades.query.filter_by(student_id=studentid).first()
-    studentgrade.grade = body.grade
-    return
+    body = request.get_json()
+    print("Student name from request:", body['name'])
+    student = Account.query.filter_by(name=body['name']).first()
+    if student:
+        studentid = student.id
+        studentgrade = [g for g in classgrades if g.student_id == studentid][0]
+        studentgrade.grade = body['grade']
+        db.session.commit()
+        return jsonify({'success': True})
+    else:
+        return jsonify({'success': False})
 
 @app.route("/classes/<course>", methods=['POST'])
 @login_required
 def addStudent(course):
-    newStudent = Grades(student_id=current_user.id,
-                     class_id=(Courses.query.filter_by(name=course).first()).id,
-                     grade=0)
-    (Courses.query.filter_by(name=course).first()).currentEnrollment = (Courses.query.filter_by(name=course).first()).currentEnrollment + 1
+    find_course = Courses.query.filter_by(name=course).first()
+
+    # check enrollment of student
+    enrollment = Grades.query.filter_by(student_id=current_user.id, class_id=find_course.id).count()
+    if enrollment > 0:
+        return 'Already enrolled in '+course+''
+
+    # add student to course
+    newStudent = Grades(student_id=current_user.id, class_id=find_course.id, grade=0)
+    find_course.currentEnrollment += 1
     db.session.add(newStudent)
     db.session.commit()
-    return course
+    return 'Enrolled in '+course+''
+
 
 @app.route("/classes/<course>", methods=['DELETE'])
 @login_required
 def dropStudent(course):
-    classid = (Courses.query.filter_by(name=course).first()).id
-    classGrades = Grades.query.filter_by(class_id=classid).all()
-    classGrades.query.filter_by(student_id=current_user.id).delete()
-    (Courses.query.filter_by(name=course).first()).currentEnrollment = (Courses.query.filter_by(
-        name=course).first()).currentEnrollment - 1
-    db.session.commit()
-    return course
+    find_course = Courses.query.filter_by(name=course).first()
+    classid = find_course.id
+    grade_obj = Grades.query.filter_by(student_id=current_user.id, class_id=classid).first()
+    if grade_obj:
+        db.session.delete(grade_obj)
+        find_course.currentEnrollment -= 1
+        db.session.commit()
+        return jsonify({'success': True})
+    else:
+        return jsonify({'success': False})
+
 
 @app.route("/logout")
 @login_required

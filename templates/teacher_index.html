@@ -5,36 +5,6 @@
     <link rel="stylesheet" href="static/style.css">
     <title>Gradebook</title>
     <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/1950/1950715.png">
-    <!-- TODO: replace this with a static image (currently it's hotlinked) -->
-    <style>
-
-        #classTable {
-            font-family: Arial, Helvetica, sans-serif;
-            border-collapse: collapse;
-            width: 90%;
-            margin-top: 2.5%;
-            margin-bottom: 2.5%;
-            margin-left: 5%;
-            margin-right: 5%;
-        }
-
-        #classTable td, #classTable th {
-            border: 1px solid #ddd;
-            padding: 8px;
-        }
-
-        #classTable tr:nth-child(even){background-color: #f2f2f2;}
-
-        #classTable tr:hover {background-color: #ddd;}
-
-        #classTable th {
-            padding-top: 12px;
-            padding-bottom: 12px;
-            text-align: left;
-            background-color: #048eaa;
-            color: white;
-        }
-    </style>
 </head>
 
 <body>
@@ -61,13 +31,13 @@
 
     <div class="box">
         <ul>
-            <li style="width:100%"><a id="header" onclick="getTeacherClasses()">Your Courses</a></li>
+            <li style="width:100%" id="header"><a>Your Courses</a></li>
         </ul>
 
         <div id="placeholder"></div>
     </div>
     <script>
-        // run functions here
+        getTeacherClasses();
     </script>
 </body>
 
