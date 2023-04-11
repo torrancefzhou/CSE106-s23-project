@@ -24,6 +24,40 @@ function getStudentClasses() {
     xhttp.send();
 }
 
+function getStudentClassesAdmin() {
+      var table = "<table border='1' id='classTable'>";
+      message = "Class dropped"
+      table += "<tr><th>Name</th>" +
+               "<th>Instructor</th>" +
+               "<th>Time</th>" +
+               "<th>Students Enrollment</th>" +
+               "<th>Drop Class</th></tr>";
+
+      table += "<tr> <td>CSE 1</td>" +
+               "<td>Grace</td>" +
+               "<td>TR 11:00-11:50 AM</td>" +
+               "<td>5/10</td>" +
+               "<td><button onclick='displayAlert(message)'>" + "Drop Class" + "</button></td></tr>" +
+               "<tr><td>CSE 2</td>" +
+               "<td>Bob</td>" +
+               "<td>MWF 1:00-2:50 PM</td>" +
+               "<td>2/10</td>" +
+               "<td><button onclick='displayAlert(message)'>" + "Drop Class" + "</button></td></tr>" +
+               "<tr><td>CSE 3</td>" +
+               "<td>Joebery</td>" +
+               "<td>TW 11:00-11:50 AM</td>" +
+               "<td>7/10</td>" +
+               "<td><button onclick='displayAlert(message)'>" + "Drop Class" + "</button></td></tr>";
+
+      document.getElementById("placeholder").innerHTML = table;
+    document.getElementById("addHeader").classList.remove("active");
+      document.getElementById("enrolledHeader").classList.add("active");
+}
+
+function displayAlert(message) {
+  alert(message);
+}
+
 function getTeacherClasses() {
     var xhttp = new XMLHttpRequest();
     xhttp.open("GET", "/class");
@@ -36,17 +70,39 @@ function getTeacherClasses() {
                "<th>Students Enrollment</th>" +
                "<th></th></tr>";
       for (var i = 0; i < data.length; i++) {
-        classname = data[i].name;
-        table += "<tr><td onclick='seeGrades(\"" + classname + "\")'>" + classname + "</td>";
+        table += "<tr><td>" + data[i].name + "</td>";
         table += "<td>" + data[i].instructor + "</td>";
         table += "<td>" + data[i].time + "</td>";
         table += "<td>" + data[i].currentEnrollment + "/" + data[i].maxEnrollment + "</td>";
-        table += "<td>" + "<button onclick='seeGrades(\"" + classname + "\")'>" + "View Grades</button></td></tr>";
+        table += "<td>" + "<button onclick='seeGrades(\"" + data[i].name + "\")'>" + "View Grades</button></td></tr>";
       }
       document.getElementById("placeholder").innerHTML = table;
     };
     document.getElementById("header").innerHTML = "<a>Your Courses</a>"
     xhttp.send();
+}
+
+function getTeacherClassesAdmin() {
+    var table = "<table border='1' id='classTable'>";
+    message = "See Grades for students in class"
+    table += "<tr><th>Name</th>" +
+               "<th>Instructor</th>" +
+               "<th>Time</th>" +
+               "<th>Students Enrollment</th>" +
+               "<th></th></tr>";
+    table += "<tr> <td>CSE 1</td>" +
+               "<td>admin</td>" +
+               "<td>TR 11:00-11:50 AM</td>" +
+               "<td>5/10</td>" +
+               "<td>" + "<button onclick='displayAlert(message)'>" + "View Grades</button></td></tr>" +
+               "<tr><td>CSE 2</td>" +
+               "<td>admin</td>" +
+               "<td>MWF 1:00-2:50 PM</td>" +
+               "<td>2/10</td>" +
+               "<td>" + "<button onclick='displayAlert(message)'>" + "View Grades</button></td></tr>";
+      document.getElementById("placeholder").innerHTML = table;
+    document.getElementById("addHeader").classList.add("active");
+    document.getElementById("enrolledHeader").classList.remove("active");
 }
 
 function allClasses() {
@@ -67,7 +123,7 @@ function allClasses() {
         table += "<td>" + data[i].time + "</td>";
         table += "<td>" + data[i].currentEnrollment + "/" + data[i].maxEnrollment + "</td>";
         if (data[i].enrolled){
-          table += "<td><button onclick='dropCourse(\"" + data[i].name + "\")'>" + "Drop Class" + "</button></td></tr>"
+            table += "<td><button onclick='dropCourse(\"" + data[i].name + "\")'>" + "Drop Class" + "</button></td></tr>"
         }
         else if (data[i].currentEnrollment >= data[i].maxEnrollment){
             table += "<td>" + "Not available" + "</td></tr>";

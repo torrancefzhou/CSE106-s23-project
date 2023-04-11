@@ -2,7 +2,7 @@ from flask import Flask, redirect, url_for, request, render_template, jsonify
 from flask_admin import Admin
 from flask_sqlalchemy import SQLAlchemy
 from flask_admin.contrib import sqla
-from flask_admin.contrib.sqla import ModelView
+from flask_admin.menu import MenuLink
 from flask_login import current_user, login_user, login_required, LoginManager, UserMixin, logout_user
 
 from sqlalchemy import inspect
@@ -101,11 +101,23 @@ class GradeModelView(sqla.ModelView):
         # redirect to login page if user doesn't have access
         return redirect(url_for('login', next=request.url))
 
+class LogoutMenuLink(MenuLink):
+
+    def is_accessible(self):
+        return current_user.is_authenticated
+
+class LoginMenuLink(MenuLink):
+
+    def is_accessible(self):
+        return not current_user.is_authenticated
 
 admin = Admin(app, name='gradebook', template_mode='bootstrap3')
 admin.add_view(AccountModelView(Account, db.session))
 admin.add_view(CourseModelView(Courses, db.session))
 admin.add_view(GradeModelView(Grades, db.session))
+admin.add_link(LoginMenuLink(name='Return to Login Page', category='', url="/login"))
+admin.add_link(LogoutMenuLink(name='Return to Homepage', category='', url="/index"))
+admin.add_link(LogoutMenuLink(name='Logout', category='', url="/logout"))
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -168,6 +180,7 @@ def getClass():
 @login_required
 def getAllClass():
     data = Courses.query.all()
+
     return jsonify([{"name": item.name,
                      "instructor": (Account.query.filter_by(id=item.instructor_id).first()).name,
                      "time": item.time,
