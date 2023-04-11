@@ -25,6 +25,8 @@ class Account(UserMixin, db.Model):
     is_teacher = db.Column(db.Boolean, nullable=False)
     is_admin = db.Column(db.Boolean, nullable=False)
 
+    teaching = db.relationship('Courses', backref='account')
+    enrollment = db.relationship('Grades', backref='account')
 
     def __repr__(self):
         return '<Account %r>' % self.username
@@ -42,6 +44,8 @@ class Courses(db.Model):
     instructor_id = db.Column(db.Integer, db.ForeignKey('account.id'), nullable=False) # e.g. "1001"
     #instructor = db.relationship('Account', backref=db.backref('teacher', lazy=True))
 
+    grades = db.relationship('Grades', backref='courses')
+
     def __repr__(self):
         return '<Course %r>' % self.name
 
@@ -51,6 +55,7 @@ class Grades(db.Model):
     student_id = db.Column(db.Integer, db.ForeignKey('account.id'), nullable=False)
     class_id = db.Column(db.Integer, db.ForeignKey('courses.id'), nullable=False)
     grade = db.Column(db.Integer)
+
 
 
 with app.app_context():
