@@ -92,7 +92,7 @@ function checkEnrollment(course) {
 
 function seeGrades(course) {
   var xhttp = new XMLHttpRequest();
-  xhttp.open("GET", "http://localhost:5000/classes/" + course);
+  xhttp.open("GET", "/classes/" + course);
   xhttp.onload = function() {
     var data = JSON.parse(this.responseText);
     var table = "<table border='1' id='classTable'>";
