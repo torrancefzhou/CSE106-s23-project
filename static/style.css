@@ -1,0 +1,102 @@
+/* Main background Color */
+body {
+    background-color: rgba(52, 165, 231, 0.423);
+}
+
+/* Main Box content formatting */
+.box {
+    text-align: center;
+    background-color: white;
+    margin-top: 50px;
+    margin-left: 100px;
+    margin-right: 100px;
+    border: 5px solid black;
+}
+
+.login {
+    text-align: center;
+    padding-top: 50px;
+    padding-bottom: 50px;
+}
+
+
+.big-title {
+    font-size: 40px;
+    font-weight: bold;
+    text-align: center;
+}
+
+
+.little-title {
+    text-align: center;
+    font-size: 30px;
+}
+
+/* Formatting for index navbar */
+ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: rgb(52, 165, 231);
+}
+
+li {
+    float:left;
+}
+
+li a {
+    display: block;
+    color: black;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+/* Change the link color to #111 (black) on hover */
+li:not(#header) a:hover {
+    background-color:beige;
+}
+
+.active {
+    background-color: white;
+}
+
+#header {
+    text-align:left;
+    position:relative;
+}
+.back-button {
+    position:absolute;
+    top: 14px;
+    left: 16px;
+}
+
+#classTable {
+    font-family: Arial, Helvetica, sans-serif;
+    border-collapse: collapse;
+    width: 90%;
+    margin-top: 2.5%;
+    margin-bottom: 2.5%;
+    margin-left: 5%;
+    margin-right: 5%;
+}
+
+#classTable td, #classTable th {
+    border: 1px solid #ddd;
+    padding: 8px;
+}
+
+#classTable tr:nth-child(even){background-color: #f2f2f2;}
+
+#classTable tr:hover {background-color: #ddd;}
+
+#classTable th {
+    padding-top: 12px;
+    padding-bottom: 12px;
+    text-align: left;
+    background-color: #048eaa;
+    color: white;
+}
