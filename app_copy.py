@@ -3,7 +3,7 @@ from flask_admin import Admin
 from flask_sqlalchemy import SQLAlchemy
 from flask_admin.contrib import sqla
 from flask_admin.menu import MenuLink
-from flask_login import current_user, login_user, login_required, LoginManager, UserMixin, logout_user
+from flask_login import current_user, login_user, login_required, LoginManager, UserMixin, logout_user, AnonymousUserMixin
 
 from sqlalchemy import inspect
 
@@ -24,15 +24,15 @@ class User(UserMixin, db.Model):
     name = db.Column(db.String, nullable=False)
     is_admin = db.Column(db.Boolean, nullable=False)
 
-    posts = db.relationship('Courses', backref='user')
-    comments = db.relationship('Grades', backref='user')
+    # changed here
+    posts = db.relationship('Posts', backref='user')
+    comments = db.relationship('Comments', backref='user')
 
     def __repr__(self):
         return '<User %r>' % self.username
 
     def check_password(self, password):
         return self.password == password
-
 
 class Posts(db.Model):
     id = db.Column(db.Integer, unique=True, primary_key=True, nullable=False)
@@ -59,8 +59,8 @@ class Comments(db.Model):
     likes = db.Column(db.Integer)
     dislikes = db.Column(db.Integer)
     
-
-    rating = db.relationship('Ratings', backref='posts')
+    # changed here
+    rating = db.relationship('Ratings', backref='post')
 
     def __repr__(self):
         return '<Comments %r>' % self.body
@@ -131,13 +131,10 @@ class RatingModelView(sqla.ModelView):
 
 
 class LogoutMenuLink(MenuLink):
-
     def is_accessible(self):
         return current_user.is_authenticated
 
-
 class LoginMenuLink(MenuLink):
-
     def is_accessible(self):
         return not current_user.is_authenticated
 
@@ -158,21 +155,17 @@ login_manager.login_view = 'login'
 def load_user(user_id):
     return User.query.get(user_id)
 
-
 @app.route('/index')
 @app.route('/')
-@login_required
 def index(): # put application's code here
-    if current_user.is_admin:
+    if current_user.is_authenticated and current_user.is_admin:
         return render_template('admin_index.html')
     else:
         return render_template('index.html')
 
-
 @app.route('/login')
 def login_page():
     return render_template('login.html')
-
 
 @app.route('/login', methods=['POST'])
 def login():
@@ -189,7 +182,6 @@ def login():
 @login_required
 def myPosts():
         data = Posts.query.filter_by(user_id=current_user.id).all()
-
         return jsonify([{"title": item.title,
                      "id": item.id,
                      "body": item.body,
