@@ -3,7 +3,8 @@ from flask_admin import Admin
 from flask_sqlalchemy import SQLAlchemy
 from flask_admin.contrib import sqla
 from flask_admin.menu import MenuLink
-from flask_login import current_user, login_user, login_required, LoginManager, UserMixin, logout_user, AnonymousUserMixin
+from flask_login import current_user, login_user, login_required, LoginManager, UserMixin, logout_user
+import bcrypt
 
 from sqlalchemy import inspect
 
@@ -24,15 +25,18 @@ class User(UserMixin, db.Model):
     name = db.Column(db.String, nullable=False)
     is_admin = db.Column(db.Boolean, nullable=False)
 
-    # changed here
     posts = db.relationship('Posts', backref='user')
     comments = db.relationship('Comments', backref='user')
 
     def __repr__(self):
         return '<User %r>' % self.username
+    
+    def set_password(self, password):
+        self.password_hash = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
 
     def check_password(self, password):
         return self.password == password
+
 
 class Posts(db.Model):
     id = db.Column(db.Integer, unique=True, primary_key=True, nullable=False)
@@ -59,7 +63,7 @@ class Comments(db.Model):
     likes = db.Column(db.Integer)
     dislikes = db.Column(db.Integer)
     
-    # changed here
+
     rating = db.relationship('Ratings', backref='post')
 
     def __repr__(self):
@@ -346,13 +350,19 @@ def editCommentRating(postID, commentID):
     else:
         return jsonify({'success': False})
 
-
 @app.route("/logout")
 @login_required
 def logout():
     logout_user()
     return redirect('login')
 
+@app.route("/register", methods=["GET"])
+def register_page():
+    return render_template("register.html")
+
+@app.route("register", methods=["POST"])
+def register():
+    pass
 
 if __name__ == "__main__":
     app.run()
