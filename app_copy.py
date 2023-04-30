@@ -360,8 +360,11 @@ def logout():
 def register_page():
     return render_template("register.html")
 
-@app.route("register", methods=["POST"])
+@app.route("/register", methods=["POST"])
 def register():
+    body = request.get_json()
+    username = body["username"]
+    password = body["password"]
     pass
 
 if __name__ == "__main__":
