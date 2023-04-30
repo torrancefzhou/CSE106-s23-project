@@ -181,7 +181,6 @@ def login():
     login_user(user)
     return redirect(url_for('index'))
 
-
 @app.route('/posts', methods=['GET'])
 @login_required
 def myPosts():
@@ -362,10 +361,16 @@ def register_page():
 
 @app.route("/register", methods=["POST"])
 def register():
-    body = request.get_json()
-    username = body["username"]
-    password = body["password"]
-    pass
+    username = request.form["username"]
+    password = request.form["password"]
+    user = User.query.filter_by(username=request.form['username']).first()
+    if user:
+        return "user already exists", 409
+    newUser = User(username=username, password="", name="", is_admin=False)
+    newUser.set_password(password)
+    db.session.add(newUser)
+    db.session.commit()
+    return redirect('login')
 
 if __name__ == "__main__":
     app.run()
