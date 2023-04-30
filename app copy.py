@@ -4,6 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_admin.contrib import sqla
 from flask_admin.menu import MenuLink
 from flask_login import current_user, login_user, login_required, LoginManager, UserMixin, logout_user
+import bcrypt
 
 from sqlalchemy import inspect
 
@@ -24,14 +25,20 @@ class User(UserMixin, db.Model):
     name = db.Column(db.String, nullable=False)
     is_admin = db.Column(db.Boolean, nullable=False)
 
-    posts = db.relationship('Courses', backref='user')
-    comments = db.relationship('Grades', backref='user')
+    posts = db.relationship('Posts', backref='user')
+    comments = db.relationship('Comments', backref='user')
 
     def __repr__(self):
         return '<User %r>' % self.username
+    
+    def set_password(self, password):
+        self.password_hash = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
 
     def check_password(self, password):
-        return self.password == password
+        return bcrypt.checkpw(password.encode('utf-8'), self.password_hash.encode('utf-8'))
+    
+    # def check_password(self, password):
+    #     return self.password == password
 
 
 class Posts(db.Model):
@@ -60,7 +67,7 @@ class Comments(db.Model):
     dislikes = db.Column(db.Integer)
     
 
-    rating = db.relationship('Ratings', backref='posts')
+    rating = db.relationship('Ratings', backref='post')
 
     def __repr__(self):
         return '<Comments %r>' % self.body
