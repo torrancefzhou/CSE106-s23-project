@@ -23,7 +23,7 @@ class User(UserMixin, db.Model):
     username = db.Column(db.String, unique=True, nullable=False)
     password_hash = db.Column(db.String, unique=True, nullable=False) # should this be unique?
     name = db.Column(db.String, nullable=False)
-    is_admin = db.Column(db.Boolean, nullable=False)
+    is_admin = db.Column(db.Boolean)
 
     posts = db.relationship('Posts', backref='user')
     comments = db.relationship('Comments', backref='user')
@@ -72,13 +72,13 @@ class Comments(db.Model):
 class Ratings(db.Model):
     id = db.Column(db.Integer, unique=True, primary_key=True, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    post_id = db.Column(db.Integer, db.ForeignKey('posts.id'), nullable=False)
-    comment_id = db.Column(db.Integer, db.ForeignKey('comments.id'), nullable=False)
+    post_id = db.Column(db.Integer, db.ForeignKey('posts.id'))
+    comment_id = db.Column(db.Integer, db.ForeignKey('comments.id'))
     rating = db.Column(db.Integer) #0 Neutral, 1 Liked, 2 Disliked
 
 
 with app.app_context():
-    # db.drop_all() # resets tables between instances, do this if you change table models
+    #db.drop_all() # resets tables between instances, do this if you change table models
     db.create_all()
 
 def can_access_admin_db():
