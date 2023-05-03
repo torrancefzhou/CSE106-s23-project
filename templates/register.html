@@ -10,7 +10,7 @@
 <body>
     <div class="user_bar">
         {% if current_user.is_authenticated %}
-            <a href="/users/{{current_user.name}}" class="user_page_link">{{ current_user.name }}</a>
+            <a href="/users/{{current_user.username}}" class="user_page_link">{{ current_user.username }}</a>
             |
             <a href="/new_post">Make a post!</a>
             |
@@ -41,7 +41,7 @@
     
     <h1 style="text-align: center;">Register</h1>
     <div class="register_box">
-        <form action="/register" method="post" class="user_info_form">
+        <form action="/register" method="POST" class="user_info_form">
             <!-- TODO: Show that the username is taken BEFORE submission -->
             <label for="username">Username<br>
                 <input type="text" placeholder="Enter username" name="username" id="username" required="">

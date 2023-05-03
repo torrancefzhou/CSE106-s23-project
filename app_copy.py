@@ -35,7 +35,7 @@ class User(UserMixin, db.Model):
         self.password_hash = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
 
     def check_password(self, password):
-        return bcrypt.checkpw(password, self.password_hash)
+        return bcrypt.checkpw(password.encode('utf-8'), self.password_hash)
 
 
 class Posts(db.Model):
@@ -81,14 +81,16 @@ with app.app_context():
     # db.drop_all() # resets tables between instances, do this if you change table models
     db.create_all()
 
+def can_access_admin_db():
+    return True  # to make new account after resetting DB
+    return current_user.get_id() and current_user.is_admin
 
 class UserModelView(sqla.ModelView):
     column_hide_backrefs = False
     column_list = ['id', 'username', 'name', 'is_admin']
 
     def is_accessible(self):
-        #return True  # to make new account after resetting DB
-        return current_user.get_id() and current_user.is_admin
+        return can_access_admin_db()
 
     def inaccessible_callback(self, name, **kwargs):
         # redirect to login page if user doesn't have access
@@ -100,8 +102,7 @@ class PostModelView(sqla.ModelView):
     column_list = [c_attr.key for c_attr in inspect(Posts).mapper.column_attrs]
 
     def is_accessible(self):
-        #return True  # to make new account after resetting DB
-        return current_user.get_id() and current_user.is_admin
+        return can_access_admin_db()
 
     def inaccessible_callback(self, name, **kwargs):
         # redirect to login page if user doesn't have access
@@ -113,9 +114,8 @@ class CommentModelView(sqla.ModelView):
     column_list = [c_attr.key for c_attr in inspect(Comments).mapper.column_attrs]
 
     def is_accessible(self):
-        #return True  # to make new account after resetting DB
-        return current_user.get_id() and current_user.is_admin
-
+        return can_access_admin_db()
+    
     def inaccessible_callback(self, name, **kwargs):
         # redirect to login page if user doesn't have access
         return redirect(url_for('login', next=request.url))
@@ -126,8 +126,7 @@ class RatingModelView(sqla.ModelView):
     column_list = [c_attr.key for c_attr in inspect(Ratings).mapper.column_attrs]
 
     def is_accessible(self):
-        #return True  # to make new account after resetting DB
-        return current_user.get_id() and current_user.is_admin
+        return can_access_admin_db()
 
     def inaccessible_callback(self, name, **kwargs):
         # redirect to login page if user doesn't have access
@@ -174,11 +173,14 @@ def login_page():
 @app.route('/login', methods=['POST'])
 def login():
     if current_user.is_authenticated:
+        print("already logged in")
         return redirect(url_for('index'))
     user = User.query.filter_by(username=request.form['username']).first()
     if user is None or not user.check_password(request.form['password']):
+        print("user does not exist")
         return redirect(url_for('login'))
     login_user(user)
+    print("successful login")
     return redirect(url_for('index'))
 
 @app.route('/posts', methods=['GET'])
@@ -361,15 +363,18 @@ def register_page():
 
 @app.route("/register", methods=["POST"])
 def register():
+    print("trying to register a user")
     username = request.form["username"]
     password = request.form["password"]
     user = User.query.filter_by(username=request.form['username']).first()
     if user:
+        print("username already exists")
         return "Username already exists", 409
-    newUser = User(username=username, password="", name="", is_admin=False)
+    newUser = User(username=username, password_hash="", name="", is_admin=False)
     newUser.set_password(password)
     db.session.add(newUser)
     db.session.commit()
+    print("committed user to db")
     return redirect('login')
 
 if __name__ == "__main__":
