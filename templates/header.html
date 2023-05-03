@@ -1,15 +1,29 @@
 <div class="user_bar">
     {% if current_user.is_authenticated %}
-        <a href="/users/{{current_user.username}}" class="user_page_link">{{ current_user.username }}</a>
+        <a href="/users/{{current_user.username}}" class="user_page_link"
+            {% if request.url_rule.endpoint == "profile_page" %} 
+            {% if current_user.username == username %}
+                class="active"
+            {% endif %}
+            {% endif %}
+        >{{ current_user.username }}</a>
         |
-        <a href="/new_post">Make a post!</a>
+        <a href="/new_post"
+            {% if request.url_rule.endpoint == "new_post_page" %}class="active"{% endif %}
+        >Make a post!</a>
         |
-        <form action="/logout" id="logout_form">
+        <form action="/logout" id="logout_form"
+            {% if request.url_rule.endpoint == "logout" %}class="active"{% endif %}
+        >
             <a href="javascript:void(0)" onclick="document.getElementById('logout_form').submit();">Log Out</a>
         </form>
     {% else %}
-        <a href="/login">Log In</a>
+        <a href="/login"
+            {% if request.url_rule.endpoint == "login_page" %}class="active"{% endif %}
+        >Log In</a>
         |
-        <a href="/register">Register</a>
+        <a href="/register"
+            {% if request.url_rule.endpoint == "register_page" %}class="active"{% endif %}
+        >Register</a>
     {% endif %}
 </div>

@@ -203,7 +203,7 @@ def userPosts():
 @login_required
 def addPost():
     # add Post
-    body = request.get_json()
+    body = request.form
     title = body['title']
     tempbody = body['body']
     newPost = Posts(user_id=current_user.id, title=title, body=tempbody, likes=0, dislikes=0, comments=0)
@@ -383,6 +383,10 @@ def profile_page(username):
     if User.query.filter_by(username=username).first():
         return render_template("profile_page.html", username=username)
     return "User does not exist", 404
+
+@app.route("/new_post", methods=["GET"])
+def new_post_page():
+    return render_template("new_post.html")
 
 if __name__ == "__main__":
     app.run()
