@@ -1,21 +1,21 @@
-function getStudentClasses() {
+function getPosts() {
     var xhttp = new XMLHttpRequest();
-    xhttp.open("GET", "/class");
+    xhttp.open("GET", "/posts");
     xhttp.onload = function() {
       var data = JSON.parse(this.responseText);
       var table = "<table border='1' id='classTable'>";
-      table += "<tr><th>Name</th>" +
-               "<th>Instructor</th>" +
-               "<th>Time</th>" +
-               "<th>Students Enrollment</th>" +
-               "<th>Drop Class</th></tr>";
+      table += "<tr><th>Title</th>" +
+               "<th>Body</th>" +
+               "<th>Likes</th>" +
+               "<th>Dislikes</th>" +
+               "<th>Comments</th></tr>";
 
       for (var i = 0; i < data.length; i++) {
-        table += "<tr><td>" + data[i].name + "</td>";
-        table += "<td>" + data[i].instructor + "</td>";
-        table += "<td>" + data[i].time + "</td>";
-        table += "<td>" + data[i].currentEnrollment + "/" + data[i].maxEnrollment + "</td>";
-        table += "<td><button onclick='dropCourse(\"" + data[i].name + "\")'>" + "Drop Class" + "</button></td></tr>"
+        table += "<tr><td>" + data[i].title + "</td>";
+        table += "<td>" + data[i].body + "</td>";
+        table += "<td>" + data[i].comments + "</td>";
+        table += "<td>" + data[i].likes + "/" + data[i].dislikes + "</td>";
+        // table += "<td><button onclick='dropCourse(\"" + data[i].name + "\")'>" + "Drop Class" + "</button></td></tr>"
       }
       document.getElementById("placeholder").innerHTML = table;
       document.getElementById("addHeader").classList.remove("active");
