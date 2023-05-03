@@ -1,0 +1,15 @@
+<div class="user_bar">
+    {% if current_user.is_authenticated %}
+        <a href="/users/{{current_user.username}}" class="user_page_link">{{ current_user.username }}</a>
+        |
+        <a href="/new_post">Make a post!</a>
+        |
+        <form action="/logout" id="logout_form">
+            <a href="javascript:void(0)" onclick="document.getElementById('logout_form').submit();">Log Out</a>
+        </form>
+    {% else %}
+        <a href="/login">Log In</a>
+        |
+        <a href="/register">Register</a>
+    {% endif %}
+</div>
