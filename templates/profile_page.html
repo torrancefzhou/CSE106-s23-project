@@ -39,12 +39,12 @@
 </head>
 <body>
 	<header>
-		<h1>Profile Page</h1>
+		<h1>{{username}}'s Profile</h1>
 	</header>
 	<!DOCTYPE html>
 
   <head>
-    <title>User Profile Page</title>
+    <title>{{username}}</title>
     <style>
       /* Style for circular profile picture */
       .profile-pic {
@@ -99,15 +99,24 @@
       <button class="tablinks" onclick="openTab(event, 'profile')">Profile</button>
     </div>
     <div id="posts" class="tabcontent">
-        <h1>My Posts</h1>
-        <div id="posts-container"></div>
+        <h1>{{username}}'s Posts</h1>
+        <div id="posts-container">
+          0 posts found.
+        </div>
         
         <script>
             // Fetch posts data from API endpoint
-            fetch('/api/posts')
+            fetch('/posts', {
+              method: "GET",
+              body: {
+                username: "{{username}}"
+              }
+            })
                 .then(response => response.json())
                 .then(posts => {
                     // Create HTML elements for each post
+                    let container = document.getElementById("posts-container");
+                    container.innerHTML = posts.length + " posts found."
                     posts.forEach(post => {
                         const postElement = document.createElement('div');
                         postElement.innerHTML = `
@@ -115,11 +124,12 @@
                             <p>${post.body}</p>
                             <p>Likes: ${post.likes} / Dislikes: ${post.dislikes} / Comments: ${post.comments}</p>
                         `;
-                        document.getElementById('posts-container').appendChild(postElement);
+                        container.appendChild(postElement);
                     });
                 });
         </script>
     </div>
+    <!-- CHECK IF THIS IS THE PROFILE PAGE OF THE LOGGED IN USER BEFORE RENDERING -->
     <div id="profile" class="tabcontent">
       <!-- Display user's personal information here -->
       <form>

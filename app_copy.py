@@ -21,7 +21,7 @@ db = SQLAlchemy(app)
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String, unique=True, nullable=False)
-    password_hash = db.Column(db.String, unique=True, nullable=False)
+    password_hash = db.Column(db.String, unique=True, nullable=False) # should this be unique?
     name = db.Column(db.String, nullable=False)
     is_admin = db.Column(db.Boolean, nullable=False)
 
@@ -186,14 +186,18 @@ def login():
 @app.route('/posts', methods=['GET'])
 @login_required
 def myPosts():
-        data = Posts.query.filter_by(user_id=current_user.id).all()
-        return jsonify([{"title": item.title,
-                     "id": item.id,
-                     "body": item.body,
-                     "likes": item.likes,
-                     "dislikes": item.dislikes,
-                     "comments": item.comments} for item in data])
+    data = Posts.query.filter_by(user_id=current_user.id).all()
+    return jsonify([{"title": item.title,
+                    "id": item.id,
+                    "body": item.body,
+                    "likes": item.likes,
+                    "dislikes": item.dislikes,
+                    "comments": item.comments} for item in data])
 
+@app.route("/postsby/<username>", methods=['GET'])
+@login_required
+def userPosts():
+    pass
 
 @app.route("/posts", methods=['POST'])
 @login_required
@@ -363,19 +367,22 @@ def register_page():
 
 @app.route("/register", methods=["POST"])
 def register():
-    print("trying to register a user")
     username = request.form["username"]
     password = request.form["password"]
     user = User.query.filter_by(username=request.form['username']).first()
     if user:
-        print("username already exists")
         return "Username already exists", 409
     newUser = User(username=username, password_hash="", name="", is_admin=False)
     newUser.set_password(password)
     db.session.add(newUser)
     db.session.commit()
-    print("committed user to db")
     return redirect('login')
+
+@app.route("/users/<username>", methods=["GET"])
+def profile_page(username):
+    if User.query.filter_by(username=username).first():
+        return render_template("profile_page.html", username=username)
+    return "User does not exist", 404
 
 if __name__ == "__main__":
     app.run()
