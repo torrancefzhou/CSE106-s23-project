@@ -18,10 +18,27 @@ function getPosts() {
         // table += "<td><button onclick='dropCourse(\"" + data[i].name + "\")'>" + "Drop Class" + "</button></td></tr>"
       }
       document.getElementById("placeholder").innerHTML = table;
-      document.getElementById("addHeader").classList.remove("active");
-      document.getElementById("enrolledHeader").classList.add("active");
     };
     xhttp.send();
+}
+
+function getProfile() {
+  var xhttp = new XMLHttpRequest();
+  xhttp.open("GET", "/profile");
+  xhttp.onload = function() {
+    var data = JSON.parse(this.responseText);
+    var table = "<table border='1' id='classTable'>";
+    table += "<tr><th>Username</th>" +
+             "<th>Name</th></tr>";
+
+    for (var i = 0; i < data.length; i++) {
+      table += "<tr><td>" + data[i].username + "</td>";
+      table += "<td>" + data[i].name + "</td>";
+      // table += "<td><button onclick='dropCourse(\"" + data[i].name + "\")'>" + "Drop Class" + "</button></td></tr>"
+    }
+    document.getElementById("placeholder2").innerHTML = table;
+  };
+  xhttp.send();
 }
 
 function getStudentClassesAdmin() {

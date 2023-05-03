@@ -1,41 +1,9 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Profile Page</title>
-	<style>
-		body {
-			font-family: Arial, sans-serif;
-			margin: 0;
-			padding: 0;
-		}
-		header {
-			background-color: #333;
-			color: #fff;
-			padding: 20px;
-		}
-		h1 {
-			margin: 0;
-		}
-		main {
-			padding: 20px;
-		}
-		img {
-			max-width: 100%;
-			height: auto;
-		}
-		table {
-			border-collapse: collapse;
-			width: 100%;
-		}
-		th, td {
-			padding: 10px;
-			text-align: left;
-			border-bottom: 1px solid #ddd;
-		}
-		tr:hover {
-			background-color: #f5f5f5;
-		}
-	</style>
+  <link rel="stylesheet" href="static/style.css">
+  <title>Gradebook</title>
+  <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/1950/1950715.png">
 </head>
 <body>
 	<header>
@@ -90,19 +58,20 @@
     </style>
   </head>
   <body>
+    <script src="{{ url_for('static',filename='script.js') }}"></script>
     <header>
       <!-- Header content here -->
     </header>
     <div class="profile-pic"></div>
     <div class="tab">
-      <button class="tablinks" onclick="openTab(event, 'posts')">Posts</button>
-      <button class="tablinks" onclick="openTab(event, 'profile')">Profile</button>
+      <button class="tablinks" onclick="getPosts()">Posts</button>
+      <button class="tablinks" onclick="getProfile()">Profile</button>
     </div>
     <div id="posts" class="tabcontent">
         <h1>My Posts</h1>
-        <div id="posts-container"></div>
+        <!-- <div id="posts-container"></div> -->
         
-        <script>
+        <!-- <script>
             // Fetch posts data from API endpoint
             fetch('/api/posts')
                 .then(response => response.json())
@@ -118,11 +87,12 @@
                         document.getElementById('posts-container').appendChild(postElement);
                     });
                 });
-        </script>
-    </div>
-    <div id="profile" class="tabcontent">
+        </script> -->
+        
+    <!-- </div>
+    <div id="profile" class="tabcontent"> -->
       <!-- Display user's personal information here -->
-      <form>
+      <!-- <form>
         <label for="name">Name:</label>
         <input type="text" id="name" name="name" value="John Doe"><br><br>
         <label for="email">Email:</label>
@@ -131,9 +101,19 @@
         <input type="password" id="password" name="password" value="********"><br><br>
         <input type="submit" value="Save Changes">
       </form>
+    </div> -->
+
+    <div class="box">
+        <!-- <ul>
+            <li style="width:50%"><a id="enrolledHeader" onclick="getPosts()" class="active">Enrolled Courses</a></li>
+            <li style="width:50%"><a id="addHeader" onclick="allClasses()">Add Courses</a></li>
+        </ul> -->
+        <div id="placeholder2"></div>
     </div>
 
-    <script>
+    <script>getProfile()</script>
+
+    <!-- <script>
       // Function to open tab content
       function openTab(evt, tabName) {
         var i, tabcontent, tablinks;
@@ -152,5 +132,5 @@
       // Show the default tab on page load
       document.getElementsByClassName("tablinks")[0].click();
     </script>
-  </body>
+  </body> -->
 </html>
