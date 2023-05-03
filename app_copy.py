@@ -21,7 +21,7 @@ db = SQLAlchemy(app)
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String, unique=True, nullable=False)
-    password = db.Column(db.String, unique=True, nullable=False)
+    password_hash = db.Column(db.String, unique=True, nullable=False)
     name = db.Column(db.String, nullable=False)
     is_admin = db.Column(db.Boolean, nullable=False)
 
@@ -35,7 +35,7 @@ class User(UserMixin, db.Model):
         self.password_hash = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
 
     def check_password(self, password):
-        return self.password == password
+        return bcrypt.checkpw(password, self.password_hash)
 
 
 class Posts(db.Model):
@@ -365,7 +365,7 @@ def register():
     password = request.form["password"]
     user = User.query.filter_by(username=request.form['username']).first()
     if user:
-        return "user already exists", 409
+        return "Username already exists", 409
     newUser = User(username=username, password="", name="", is_admin=False)
     newUser.set_password(password)
     db.session.add(newUser)
