@@ -197,10 +197,9 @@ def userPosts(username):
                     "comments": item.comments} for item in data])
 
 @app.route('/allposts', methods=['GET'])
-@login_required
+# @login_required 
 def allPosts():
         data = Posts.query.all()
-
         return jsonify([{"title": item.title,
                      "id": item.id,
                      "body": item.body,
@@ -366,10 +365,11 @@ def register_page():
 def register():
     username = request.form["username"]
     password = request.form["password"]
+    name = request.form["name"]
     user = User.query.filter_by(username=request.form['username']).first()
     if user:
         return "Username already exists", 409
-    newUser = User(username=username, password_hash="", name="", is_admin=False)
+    newUser = User(username=username, password_hash="", name=name, is_admin=False)
     newUser.set_password(password)
     db.session.add(newUser)
     db.session.commit()
