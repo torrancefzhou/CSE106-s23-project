@@ -184,10 +184,11 @@ def login():
     print("successful login")
     return redirect(url_for('index'))
 
-@app.route('/posts', methods=['GET'])
+@app.route('/postsby/<username>', methods=['GET'])
 @login_required
-def myPosts():
-    data = Posts.query.filter_by(user_id=current_user.id).all()
+def userPosts(username):
+    data = User.query.filter_by(username=username).first()
+    data = Posts.query.filter_by(user_id=data.id).all()
     return jsonify([{"title": item.title,
                     "id": item.id,
                     "body": item.body,
@@ -195,10 +196,18 @@ def myPosts():
                     "dislikes": item.dislikes,
                     "comments": item.comments} for item in data])
 
-@app.route("/postsby/<username>", methods=['GET'])
+@app.route('/allposts', methods=['GET'])
 @login_required
-def userPosts():
-    pass
+def allPosts():
+        data = Posts.query.all()
+
+        return jsonify([{"title": item.title,
+                     "id": item.id,
+                     "body": item.body,
+                     "likes": item.likes,
+                     "dislikes": item.dislikes,
+                     "comments": item.comments} for item in data])
+
 
 @app.route("/posts", methods=['POST'])
 @login_required
@@ -228,22 +237,9 @@ def deletePost():
         return jsonify({'success': False})
 
 
-@app.route('/allposts', methods=['GET'])
-@login_required
-def allPosts():
-        data = Posts.query.all()
-
-        return jsonify([{"title": item.title,
-                     "id": item.id,
-                     "body": item.body,
-                     "likes": item.likes,
-                     "dislikes": item.dislikes,
-                     "comments": item.comments} for item in data])
-
-
 @app.route('/posts/<postID>', methods=['GET'])
 @login_required
-def postComments(postID):
+def seeComments(postID):
         temp = Posts.query.filter_by(id=postID).first()
         data = Comments.query.filter_by(post_id=temp.id).all()
 

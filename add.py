@@ -13,14 +13,14 @@ post1 = Posts(title = "My First Post",
                   body = "show me the money",
                   likes = 1,
                   dislikes = 1,
-                  comments = 0,
+                  comments = 2,
                   user_id = (User.query.filter_by(username = "user1").first()).id)
 
 post2 = Posts(title = "My Second Post",
                   body = "Is it working",
                   likes = 0,
                   dislikes = 1,
-                  comments = 0,
+                  comments = 1,
                   user_id = (User.query.filter_by(username = "user1").first()).id)
 
 post3 = Posts(title = "Test post",

@@ -3,8 +3,7 @@
 
 <head>
     <link rel="stylesheet" href="static/style.css">
-    <title>Gradebook</title>
-    <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/1950/1950715.png">
+    <title>Savanna Home</title>
 </head>
 
 <body>
@@ -14,7 +13,7 @@
             <td style="text-align:center; width:25%">
                 
             </td>
-            <td style="text-align:center; width:50%"><h1 class="big-title">University of California, Massachusetts</h1></td>
+            <td style="text-align:center; width:50%"><h1 class="big-title">Savanna Home</h1></td>
             <td style="text-align:center; width:25%">
                 
             </td>
@@ -26,34 +25,16 @@
 
     <div class="box">
         <ul>
-            <li style="width:50%"><a id="enrolledHeader" onclick="getStudentClasses()" class="active">Enrolled Courses</a></li>
-            <li style="width:50%"><a id="addHeader" onclick="allClasses()">Add Courses</a></li>
+            <li style="width:50%"><a id="header1" onclick="getFollowedPosts()">Followed Posts</a></li>
+            <li style="width:50%"><a id="header2" onclick="getAllPosts()" class="active">All Posts</a></li>
         </ul>
         <div id="posts-container"></div>
     </div>
 
-    {% include 'footer.html' %}
+
 
     <script>
-        // Fetch posts data from API endpoint
-        fetch('/allposts', {
-            method: "GET",
-        })
-            .then(response => response.json())
-            .then(posts => {
-                // Create HTML elements for each post
-                let container = document.getElementById("posts-container");
-                container.innerHTML = posts.length + " posts found."
-                posts.forEach(post => {
-                    const postElement = document.createElement('div');
-                    postElement.innerHTML = `
-                        <h2>${post.title}</h2>
-                        <p>${post.body}</p>
-                        <p>Likes: ${post.likes} / Dislikes: ${post.dislikes} / Comments: ${post.comments}</p>
-                    `;
-                    container.appendChild(postElement);
-                });
-            });
+        getAllPosts()
     </script>
 
    

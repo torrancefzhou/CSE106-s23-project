@@ -1,6 +1,6 @@
 /* Main background Color */
 body {
-    background-color: rgba(150, 200, 250);
+    background-image: linear-gradient(rgb(255, 255, 63), rgb(0, 255, 0), rgb(220, 156, 44));
     padding: 0;
     margin: 0;
 }
@@ -9,9 +9,10 @@ body {
 .box {
     text-align: center;
     background-color: white;
-    margin-top: 50px;
+    margin-top: 10px;
     margin-left: 100px;
     margin-right: 100px;
+    margin-bottom: 50px;
     border: 5px solid black;
 }
 
@@ -64,7 +65,6 @@ li:not(#header) a:hover {
 
 .active {
     background-color: white;
-    background-color: rgba(150, 200, 250);
 }
 
 #header {
@@ -76,6 +76,7 @@ li:not(#header) a:hover {
     top: 14px;
     left: 16px;
 }
+
 
 #classTable {
     font-family: Arial, Helvetica, sans-serif;
@@ -92,11 +93,41 @@ li:not(#header) a:hover {
     padding: 8px;
 }
 
-#classTable tr:nth-child(even){background-color: #f2f2f2;}
-
-#classTable tr:hover {background-color: #ddd;}
+#classTable td.blank, #classTable th.blank {
+    border: 1px solid #ffffff;
+    padding: 25px;
+}
 
 #classTable th {
+    padding-top: 12px;
+    padding-bottom: 12px;
+    text-align: left;
+    background-color: #048eaa;
+    color: white;
+}
+
+
+
+
+
+
+#postTable {
+    font-family: Arial, Helvetica, sans-serif;
+    border-collapse: collapse;
+    width: 90%;
+    margin-top: 2.5%;
+    margin-bottom: 2.5%;
+    margin-left: 5%;
+    margin-right: 5%;
+}
+
+#postTable td, #postTable th {
+    border: 1px solid #ddd;
+    padding: 8px;
+}
+
+
+#postTable th {
     padding-top: 12px;
     padding-bottom: 12px;
     text-align: left;

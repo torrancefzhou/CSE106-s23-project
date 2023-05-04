@@ -1,27 +1,41 @@
-function getPosts() {
-    var xhttp = new XMLHttpRequest();
-    xhttp.open("GET", "/posts");
-    xhttp.onload = function() {
-      var data = JSON.parse(this.responseText);
-      var table = "<table border='1' id='classTable'>";
-      table += "<tr><th>Title</th>" +
-               "<th>Body</th>" +
-               "<th>Likes</th>" +
-               "<th>Dislikes</th>" +
-               "<th>Comments</th></tr>";
+function getUserPosts(username) {
+  var xhttp = new XMLHttpRequest();
+  xhttp.open("GET", "/postsby/" + username);
+  xhttp.onload = function() {
+    var data = JSON.parse(this.responseText);
+    table = "<table border='1' id='classTable'>";
 
-      for (var i = 0; i < data.length; i++) {
-        table += "<tr><td>" + data[i].title + "</td>";
-        table += "<td>" + data[i].body + "</td>";
-        table += "<td>" + data[i].comments + "</td>";
-        table += "<td>" + data[i].likes + "/" + data[i].dislikes + "</td>";
-        // table += "<td><button onclick='dropCourse(\"" + data[i].name + "\")'>" + "Drop Class" + "</button></td></tr>"
-      }
-      document.getElementById("placeholder").innerHTML = table;
-      document.getElementById("addHeader").classList.remove("active");
-      document.getElementById("enrolledHeader").classList.add("active");
-    };
-    xhttp.send();
+    for (var i = 0; i < data.length; i++) {
+      table += "<tr><th>" + data[i].title + " -- Post ID: " + data[i].id + "</th></tr>";
+      table += "<tr><td>" + data[i].body + "</td></tr>";
+      table += "<tr><td>" + "likes - " + data[i].likes + "  dislikes - " + data[i].dislikes + "  comments - " + data[i].comments + "</td></tr>";
+      table += "<tr class='blank'><td class='blank'></td></tr>";
+    }
+    document.getElementById("posts-container").innerHTML = table;
+  };
+  xhttp.send();
+}
+
+function getAllPosts() {
+  var xhttp = new XMLHttpRequest();
+  xhttp.open("GET", "/allposts");
+  xhttp.onload = function() {
+    var data = JSON.parse(this.responseText);
+    table = "<table border='1' id='classTable'>";
+
+    for (var i = 0; i < data.length; i++) {
+      table += "<tr><th>" + data[i].title + " -- Post ID: " + data[i].id + "</th></tr>";
+      table += "<tr><td>" + data[i].body + "</td></tr>";
+      table += "<tr><td><button onclick='addLike(\"" + data[i].id + "\")'>" + "Like " + data[i].likes + "</button>";
+      table += "<button onclick='addDislike(\"" + data[i].id + "\")'>" + "Dislike " + data[i].dislikes + "</button>";
+      table += "<button onclick='seeComments(\"" + data[i].id + "\")'>" + "See Comments " + data[i].comments + "</button></td></tr>"
+      table += "<tr class='blank'><td class='blank'></td></tr>";
+    }
+    document.getElementById("posts-container").innerHTML = table;
+    document.getElementById("header1").classList.remove("active");
+    document.getElementById("header2").classList.add("active");
+  };
+  xhttp.send();
 }
 
 function getStudentClassesAdmin() {
