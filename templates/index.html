@@ -29,12 +29,31 @@
             <li style="width:50%"><a id="enrolledHeader" onclick="getStudentClasses()" class="active">Enrolled Courses</a></li>
             <li style="width:50%"><a id="addHeader" onclick="allClasses()">Add Courses</a></li>
         </ul>
-        <div id="placeholder"></div>
+        <div id="posts-container"></div>
     </div>
 
     {% include 'footer.html' %}
+
     <script>
-       
+        // Fetch posts data from API endpoint
+        fetch('/allposts', {
+            method: "GET",
+        })
+            .then(response => response.json())
+            .then(posts => {
+                // Create HTML elements for each post
+                let container = document.getElementById("posts-container");
+                container.innerHTML = posts.length + " posts found."
+                posts.forEach(post => {
+                    const postElement = document.createElement('div');
+                    postElement.innerHTML = `
+                        <h2>${post.title}</h2>
+                        <p>${post.body}</p>
+                        <p>Likes: ${post.likes} / Dislikes: ${post.dislikes} / Comments: ${post.comments}</p>
+                    `;
+                    container.appendChild(postElement);
+                });
+            });
     </script>
 
    

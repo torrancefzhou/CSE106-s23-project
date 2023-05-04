@@ -87,6 +87,7 @@ def can_access_admin_db():
 
 class UserModelView(sqla.ModelView):
     column_hide_backrefs = False
+    # column_list = [c_attr.key for c_attr in inspect(User).mapper.column_attrs]
     column_list = ['id', 'username', 'name', 'is_admin']
 
     def is_accessible(self):
