@@ -8,18 +8,7 @@
 
 <body>
     {% include 'header.html' %}
-    <table style="width:100%; height:100px">
-        <tr>
-            <td style="text-align:center; width:25%">
-                
-            </td>
-            <td style="text-align:center; width:50%"><h1 class="big-title">Savanna Home</h1></td>
-            <td style="text-align:center; width:25%">
-                
-            </td>
-            
-        </tr>
-    </table>
+    <h1 class="big-title">Savanna Home</h1>
 
     <script src="{{ url_for('static',filename='script.js') }}"></script>
 
@@ -28,7 +17,15 @@
             <li id="head1" style="width:50%"><a id="header1" onclick="getFollowedPosts()">Followed Posts</a></li>
             <li id="head2" style="width:50%"><a id="header2" onclick="getAllPosts()" class="active">All Posts</a></li>
         </ul>
-        <div id="posts-container"></div>
+        <div id="posts-container">
+        
+        </div>
+        <div class="all_posts">
+            {% for postInfo in posts %}
+                {% include 'post.html' %}
+            {% endfor %} 
+        </div>
+        
         <div id="comments-container"></div>
         <div id="test"></div>
     </div>

@@ -75,7 +75,7 @@
       ).then(posts => {
         // Create HTML elements for each post
         let container = document.getElementById("posts-container");
-        container.innerHTML = posts.length + " posts found."
+        container.innerHTML = posts.length + (posts.length > 1 ? " posts" : " post") + " found."
         posts.forEach(post => {
           const postElement = document.createElement('div');
           postElement.innerHTML = `

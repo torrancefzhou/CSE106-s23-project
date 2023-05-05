@@ -1,0 +1,25 @@
+<div class="post">
+    <a href="/page/{{postInfo.id}}" class="post_title">
+        TITLE: {{postInfo.title}}
+    </a>
+    <a href="/users/{{postInfo.poster}}" class="post_author">
+        AUTHOR: {{postInfo.poster}}
+    </a>
+    <div class="post_body">
+        CONTENT: {{postInfo.body}}
+    </div> 
+    <div class="post_footer">
+        <div class="post_rating">
+            <div class="post_upvote">
+                <button>Like</button>
+                +{{postInfo.likes}}
+            </div>
+            <div class="post_downvote">
+                -{{postInfo.dislikes}}
+                <button>Dislike</button>
+            </div>
+        </div>
+        <a href="/page/{{postInfo.id}}" class="post_comments">View {{postInfo.comments}} comments</a>
+        <button class="post_follow">Follow Author</button>
+    </div>
+</div>

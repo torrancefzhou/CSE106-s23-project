@@ -10,26 +10,20 @@
 <body>
     {% include 'header.html' %}
     <h1 class="big-title">Savanna</h1>
-    <form action="/login" method="post">
-        <div class="box">
-            <h1 class="little-title">Log in</h1>
-            <div class="login">
-            <label for="username">
-                <b>Username</b>
-            </label>
-            <input type="text" placeholder="Enter Username" name="username" required="">
-            <br>
-            <br>
-            <label for="password">
-                <b>Password</b>
-            </label>
-            <input type="password" placeholder="Enter Password" name="password" required="">
-            <br>
-            <br>
-            <button type="submit">Login</button>
-            </div>
-        </div>
-    </form>
 
+    <h1 style="text-align:center;">Log in</h1>
+    <div class="register_box">
+        <form action="/login" method="POST" class="user_info_form">
+            <label for="username">
+                Username
+                <input type="text" placeholder="Enter Username" name="username" required="">
+            </label>
+            <label for="password">
+                Password<input type="password" placeholder="Enter Password" name="password" required="">
+            </label>
+            <button type="submit">Login</button>
+        </form>
+    </div>
 </body>
+
 </html>

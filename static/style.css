@@ -1,5 +1,6 @@
 html {
     height: 100%;
+    font-family: sans-serif;
 }
 
 /* Main background Color */
@@ -161,11 +162,6 @@ li:not(#header) a:hover {
     color: white;
 }
 
-
-
-
-
-
 #postTable {
     font-family: Arial, Helvetica, sans-serif;
     border-collapse: collapse;
@@ -180,7 +176,6 @@ li:not(#header) a:hover {
     border: 1px solid #ddd;
     padding: 8px;
 }
-
 
 #postTable th {
     padding-top: 12px;
@@ -327,4 +322,64 @@ form.user_info_form {
     padding: .5rem;
     font-size: 1rem;
     font-family: sans-serif;
+}
+
+.post, .comment {
+    display: block;
+    width: calc(100% - 2rem);
+    background-color: white;
+    position: relative;
+    margin: auto 1rem;
+    text-align: left;
+}
+
+.post .post_rating, .comment .comment_rating {
+    background-color:red;
+    display: inline-block;
+    width: auto;
+    text-align: center;
+    font-weight: 700;
+    padding: 0 .25rem;
+}
+
+.post button, .comment button {
+    display: inline-block;
+}
+
+.post .post_upvote, .comment .comment_upvote {
+    display: inline-block;
+    background-color: green;
+    padding: .25rem;
+}
+.post .post_downvote, .comment .comment_downvote {
+    display: inline-block;
+    background-color: pink;
+    padding: .25rem;
+}
+
+.post .post_title {
+    display: block;
+    background-color: yellow;
+    padding: .25rem;
+}
+.post .post_author, .comment .comment_author {
+    display: block;
+    background-color: greenyellow;
+    padding: .25rem;
+}
+.post .post_body, .comment .comment_body {
+    background-color: goldenrod;
+    padding: .25rem;
+}
+.post .post_footer, .comment .comment_footer {
+    width: 100%;
+    display: block;
+    background-color: blue;
+}
+
+.post .post_footer .post_comments, 
+.post .post_footer .post_follow,
+.comment .comment_footer .comment_follow {
+    display: inline-block;
+    padding: .25rem;
 }

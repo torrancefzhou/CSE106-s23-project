@@ -81,8 +81,8 @@ function getAllPosts() {
         table += "<tr><td><button class=\"button button1\" onclick='addPostRating(" + data[i].id + ", 1)'>" + "Like " + data[i].likes + "</button>";
         table += "<button class=\"button button2\" onclick='addPostRating(" + data[i].id + ", 2)'>" + "Dislike " + data[i].dislikes + "</button>";
       }
-      
-      table += "<button onclick='seeComments(\"" + data[i].id + "\")'>" + "See Comments " + data[i].comments + "</button></td></tr>"
+      table += "<a href='/page/" + data[i].id + "'>See Comments</a></td></tr>"; 
+      // table += "<button onclick='seeComments(\"" + data[i].id + "\")'>" + "See Comments " + data[i].comments + "</button></td></tr>"
       table += "<tr class='blank'><td class='blank'></td></tr>";
     }
     document.getElementById("posts-container").innerHTML = table;

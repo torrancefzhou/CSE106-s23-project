@@ -1,0 +1,21 @@
+<div class="comment">
+    <div class="comment_author">
+        {{commentInfo.commentor}}
+    </div>
+    <div class="comment_body">
+        {{commentInfo.body}}
+    </div>
+    <div class="comment_footer">
+        <div class="comment_rating">
+            <div class="comment_upvote">
+                <button>Like</button>
+                +{{commentInfo.likes}}
+            </div>
+            <div class="comment_downvote">
+                -{{commentInfo.dislikes}}
+                <button>Dislike</button>
+            </div>
+        </div>
+        <button class="comment_follow">Follow Commentor</button>
+    </div>
+</div>

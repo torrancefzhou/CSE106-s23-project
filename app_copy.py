@@ -37,23 +37,21 @@ class User(UserMixin, db.Model):
     def check_password(self, password):
         return bcrypt.checkpw(password.encode('utf-8'), self.password_hash)
 
-
 class Posts(db.Model):
     id = db.Column(db.Integer, unique=True, primary_key=True, nullable=False)
     title = db.Column(db.String) # e.g. "CSE 100"
     body = db.Column(db.String) # e.g. "TR 3:00PM - 4:15PM"
     likes = db.Column(db.Integer) # e.g. 4 (/10)
     dislikes = db.Column(db.Integer) # e.g. (4/) 10
-    comments = db.Column(db.Integer)
+    # comments = db.Column(db.Integer)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False) # e.g. "1001"
-    #instructor = db.relationship('Account', backref=db.backref('teacher', lazy=True))
+    # instructor = db.relationship('Account', backref=db.backref('teacher', lazy=True))
 
     comment = db.relationship('Comments', backref='posts')
     rating = db.relationship('Ratings', backref='posts')
 
     def __repr__(self):
         return '<Posts %r>' % self.title
-
 
 class Comments(db.Model):
     id = db.Column(db.Integer, unique=True, primary_key=True, nullable=False)
@@ -177,25 +175,30 @@ login_manager.login_view = 'login'
 def load_user(user_id):
     return User.query.get(user_id)
 
+
+def post_data(item):
+    return {"title": item.title,
+            "id": item.id,
+            "body": item.body,
+            "poster": (User.query.filter_by(id=item.user_id).first()).username,
+            "likes": item.likes,
+            "dislikes": item.dislikes,
+            "comments": (Comments.query.filter_by(post_id=item.id)).count(),
+            "rating": 0 if not current_user.is_authenticated else 
+            Ratings.query.filter_by(post_id=item.id, user_id=current_user.id).count() > 0}
+
 def post_to_json(item):
-    return jsonify({"title": item.title,
-                    "id": item.id,
-                    "body": item.body,
-                    "likes": item.likes,
-                    "dislikes": item.dislikes,
-                    "comments": item.comments,
-                    "rating": 0 if not current_user.is_authenticated else 
-                    Ratings.query.filter_by(post_id=item.id, user_id=current_user.id).count() > 0})
+    return jsonify(post_data(item))
 
 def posts_to_json(data):
-    return jsonify([{"title": item.title,
-                    "id": item.id,
-                    "body": item.body,
-                    "likes": item.likes,
-                    "dislikes": item.dislikes,
-                    "comments": item.comments,
-                    "rating": 0 if not current_user.is_authenticated else 
-                    Ratings.query.filter_by(post_id=item.id, user_id=current_user.id).count() > 0} for item in data])
+    return jsonify([post_data(item) for item in data])
+
+def comment_data(item):
+    return {"body": item.body,
+            "commentor": (User.query.filter_by(id=item.user_id).first()).username,
+            "id": item.id,
+            "likes": item.likes,
+            "dislikes": item.dislikes}
 
 @app.route('/index')
 @app.route('/')
@@ -203,7 +206,7 @@ def index(): # put application's code here
     if current_user.is_authenticated and current_user.is_admin:
         return render_template('admin_index.html')
     else:
-        return render_template('index.html')
+        return render_template('index.html', posts=[post_data(item) for item in Posts.query.all()])
 
 @app.route('/login')
 def login_page():
@@ -232,20 +235,14 @@ def userPosts(username):
 # @login_required 
 def allPosts():
     data = Posts.query.all()
-    return jsonify([{"title": item.title,
-                "id": item.id,
-                "poster": (User.query.filter_by(id=item.user_id).first()).username,
-                "body": item.body,
-                "likes": item.likes,
-                "dislikes": item.dislikes,
-                "comments": item.comments,
-                "rating": 0 if not current_user.is_authenticated else 
-                Ratings.query.filter_by(post_id=item.id, user_id=current_user.id).count() > 0} for item in data])
+    return posts_to_json(data)
 
 @app.route('/page/<postID>', methods=["GET"])
 def postPage(postID):
     # TODO: return data of the post for jinja template
-    return render_template("post_page.html", postInfo=None)
+    return render_template("post_page.html", 
+                           postInfo=post_data(Posts.query.filter_by(id=postID).first()), 
+                           comments=[comment_data(item) for item in Comments.query.filter_by(post_id=postID)])
 
 @app.route("/posts", methods=['POST'])
 @login_required
@@ -258,7 +255,7 @@ def addPost():
     db.session.add(newPost)
     db.session.commit()
     postID = newPost.id
-    return redirect("/page/" + postID)
+    return redirect("/page/" + str(postID))
 
 
 @app.route("/posts", methods=['DELETE'])
@@ -278,35 +275,17 @@ def deletePost():
 @app.route('/posts/<postID>', methods=['GET'])
 def postbyID(postID):
     data = Posts.query.filter_by(id=postID).first()
-    return jsonify([{"title": data.title,
-                    "id": data.id,
-                    "poster": (User.query.filter_by(id=data.user_id).first()).username,
-                    "body": data.body,
-                    "likes": data.likes,
-                    "dislikes": data.dislikes,
-                    "comments": data.comments,
-                    "rating": 0 if not current_user.is_authenticated else 
-                    Ratings.query.filter_by(post_id=data.id, user_id=current_user.id).count() > 0} ])
-
+    return post_to_json(data)
 
 @app.route('/followed', methods=['GET'])
 def followedPosts():
     tempData = Followed.query.filter_by(user_id=current_user.id).all()
     data = Posts.query.filter_by(id='missing').all()
     for x in tempData:
-            temp = Posts.query.filter_by(user_id=x.followed_id).all()
-            for y in temp:
-                data.append(y)
-
-    return jsonify([{"title": item.title,
-                    "id": item.id,
-                    "poster": (User.query.filter_by(id=item.user_id).first()).username,
-                    "body": item.body,
-                    "likes": item.likes,
-                    "dislikes": item.dislikes,
-                    "comments": item.comments,
-                    "rating": 0 if not current_user.is_authenticated else 
-                    Ratings.query.filter_by(post_id=item.id, user_id=current_user.id).count() > 0} for item in data])
+        temp = Posts.query.filter_by(user_id=x.followed_id).all()
+        for y in temp:
+            data.append(y)
+    return posts_to_json(data)
 
 
 @app.route('/posts/<postID>/comments', methods=['GET'])
@@ -319,17 +298,16 @@ def seeComments(postID):
                     "likes": item.likes,
                     "dislikes": item.dislikes} for item in data])
 
-
 @app.route("/posts/<postID>/comments", methods=['POST'])
 @login_required
 def addComment(postID):
     # add Comment
-    body = request.get_json()
+    body = request.form
     tempbody = body['body']
-    newComment = Comments(user_id=current_user.id, post_id=postID, body=tempbody, likes=0, dislikes=0, comments=0)
+    newComment = Comments(user_id=current_user.id, post_id=postID, body=tempbody, likes=0, dislikes=0)
     db.session.add(newComment)
     db.session.commit()
-    return 'Created new Post'
+    return redirect("/page/" + str(postID))
 
 
 @app.route("/posts/<postID>/comments", methods=['DELETE'])
