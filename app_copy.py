@@ -457,6 +457,9 @@ def register_page():
 def register():
     username = request.form["username"]
     password = request.form["password"]
+    check = request.form["confirm"]
+    if check != password:
+        return redirect('register')
     name = request.form["name"]
     user = User.query.filter_by(username=request.form['username']).first()
     if user:
