@@ -1,14 +1,17 @@
 from app_copy import db, User, Posts, Comments, Ratings
 
 # Account
-user1 = User(username = "user1", password = "user1", name = "Connor", is_admin=False)
-user2 = User(username = "user2", password = "user2", name = "Cameron", is_admin=False)
-user3 = User(username = "user3", password = "user3", name = "Torrence", is_admin=False)
+user1 = User(username = "user1", name = "Connor", is_admin=False)
+user1.set_password("user1")
+user2 = User(username = "user2", name = "Cameron", is_admin=False)
+user2.set_password("user2")
+user3 = User(username = "user3", name = "Torrence", is_admin=False)
+user3.set_password("user3")
+admin = User(username = "admin", name = "admin", is_admin=True)
+admin.set_password("admin")
 
 
-admin = User(username = "admin", password = "admin", name = "admin", is_admin=True)
-
-# Post
+# Posts
 post1 = Posts(title = "My First Post",
                   body = "show me the money",
                   likes = 1,
@@ -69,21 +72,19 @@ rating4 = Ratings(rating = 2,
                   post_id = (Posts.query.filter_by(title = "My First Post").first()).id)
 
 
-
-
 # add
 #db.session.add(user1)
 #db.session.add(user2)
 #db.session.add(user3)
 #db.session.add(admin)
 
-db.session.add(post1)
-db.session.add(post2)
-db.session.add(post3)
+#db.session.add(post1)
+#db.session.add(post2)
+#db.session.add(post3)
 
-db.session.add(comment1)
-db.session.add(comment2)
-db.session.add(comment3)
+#db.session.add(comment1)
+#db.session.add(comment2)
+#db.session.add(comment3)
 
 db.session.add(rating1)
 db.session.add(rating2)

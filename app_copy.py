@@ -76,6 +76,13 @@ class Ratings(db.Model):
     comment_id = db.Column(db.Integer, db.ForeignKey('comments.id'))
     rating = db.Column(db.Integer) #0 Neutral, 1 Liked, 2 Disliked
 
+class Followed(db.Model):
+    id = db.Column(db.Integer, unique=True, primary_key=True, nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    followed_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    user = db.relationship("User", foreign_keys=[user_id])
+    followed = db.relationship("User", foreign_keys=[followed_id])
+
 
 with app.app_context():
     #db.drop_all() # resets tables between instances, do this if you change table models
@@ -132,6 +139,17 @@ class RatingModelView(sqla.ModelView):
     def inaccessible_callback(self, name, **kwargs):
         # redirect to login page if user doesn't have access
         return redirect(url_for('login', next=request.url))
+    
+class FollowedModelView(sqla.ModelView):
+    column_hide_backrefs = False
+    column_list = [c_attr.key for c_attr in inspect(Followed).mapper.column_attrs]
+
+    def is_accessible(self):
+        return can_access_admin_db()
+
+    def inaccessible_callback(self, name, **kwargs):
+        # redirect to login page if user doesn't have access
+        return redirect(url_for('login', next=request.url))
 
 
 class LogoutMenuLink(MenuLink):
@@ -147,6 +165,7 @@ admin.add_view(UserModelView(User, db.session))
 admin.add_view(PostModelView(Posts, db.session))
 admin.add_view(CommentModelView(Comments, db.session))
 admin.add_view(RatingModelView(Ratings, db.session))
+admin.add_view(FollowedModelView(Followed, db.session))
 admin.add_link(LoginMenuLink(name='Return to Login Page', category='', url="/login"))
 admin.add_link(LogoutMenuLink(name='Return to Homepage', category='', url="/index"))
 admin.add_link(LogoutMenuLink(name='Logout', category='', url="/logout"))
@@ -202,6 +221,7 @@ def allPosts():
     data = Posts.query.all()
     return jsonify([{"title": item.title,
                 "id": item.id,
+                "poster": (User.query.filter_by(id=item.user_id).first()).username,
                 "body": item.body,
                 "likes": item.likes,
                 "dislikes": item.dislikes,
@@ -242,12 +262,33 @@ def postbyID(postID):
     data = Posts.query.filter_by(id=postID).first()
     return jsonify([{"title": data.title,
                     "id": data.id,
+                    "poster": (User.query.filter_by(id=data.user_id).first()).username,
                     "body": data.body,
                     "likes": data.likes,
                     "dislikes": data.dislikes,
                     "comments": data.comments,
                     "rating": 0 if not current_user.is_authenticated else 
-                    Ratings.query.filter_by(post_id=data.id, user_id=current_user.id).count() > 0}])
+                    Ratings.query.filter_by(post_id=data.id, user_id=current_user.id).count() > 0} ])
+
+
+@app.route('/followed', methods=['GET'])
+def followedPosts():
+    tempData = Followed.query.filter_by(user_id=current_user.id).all()
+    data = Posts.query.filter_by(id='missing').all()
+    for x in tempData:
+            temp = Posts.query.filter_by(user_id=x.followed_id).all()
+            for y in temp:
+                data.append(y)
+
+    return jsonify([{"title": item.title,
+                    "id": item.id,
+                    "poster": (User.query.filter_by(id=item.user_id).first()).username,
+                    "body": item.body,
+                    "likes": item.likes,
+                    "dislikes": item.dislikes,
+                    "comments": item.comments,
+                    "rating": 0 if not current_user.is_authenticated else 
+                    Ratings.query.filter_by(post_id=item.id, user_id=current_user.id).count() > 0} for item in data])
 
 
 @app.route('/posts/<postID>/comments', methods=['GET'])

@@ -16,6 +16,45 @@ function getUserPosts(username) {
   xhttp.send();
 }
 
+function getFollowedPosts() {
+  var x = 0;
+  var xhttp = new XMLHttpRequest();
+  xhttp.open("GET", "/followed");
+  xhttp.onload = function() {
+    var data = JSON.parse(this.responseText);
+    table = "<table border='1' id='classTable'>";
+
+    for (var i = 0; i < data.length; i++) {
+      table += "<tr><th>" + data[i].title + " -- Poster: " + data[i].poster + " -- Post ID: " + data[i].id + "</th></tr>";
+      table += "<tr><td>" + data[i].body + "</td></tr>";
+      if (data[i].rating){
+        x = userPostRating(data[i].id);
+        if (x == "1"){
+          table += "<tr><td><button class=\"button button1active\" onclick='removeLike(\"" + data[i].id + "\")'>" + "Like " + data[i].likes + "</button>";
+          table += "<button class=\"button button2\" onclick='changetoDislike(\"" + data[i].id + "\")'>" + "Dislike " + data[i].dislikes + "</button>";
+        }
+        else if(x == "2"){
+          table += "<tr><td><button class=\"button button1\" onclick='changetoLike(\"" + data[i].id + "\")'>" + "Like " + data[i].likes + "</button>";
+          table += "<button class=\"button button2active\" onclick='removeDislike(\"" + data[i].id + "\")'>" + "Dislike " + data[i].dislikes + "</button>";
+        }
+      }
+      else{
+        table += "<tr><td><button class=\"button button1\" onclick='addPostRating(" + data[i].id + ", 1)'>" + "Like " + data[i].likes + "</button>";
+        table += "<button class=\"button button2\" onclick='addPostRating(" + data[i].id + ", 2)'>" + "Dislike " + data[i].dislikes + "</button>";
+      }
+      
+      table += "<button onclick='seeComments(\"" + data[i].id + "\")'>" + "See Comments " + data[i].comments + "</button></td></tr>"
+      table += "<tr class='blank'><td class='blank'></td></tr>";
+    }
+    document.getElementById("posts-container").innerHTML = table;
+    document.getElementById("comments-container").innerHTML = "";
+    document.getElementById("header1").classList.add("active");
+    document.getElementById("header2").classList.remove("active");
+  };
+  xhttp.send();
+}
+
+
 function getAllPosts() {
   var x = 0;
   var xhttp = new XMLHttpRequest();
@@ -25,7 +64,7 @@ function getAllPosts() {
     table = "<table border='1' id='classTable'>";
 
     for (var i = 0; i < data.length; i++) {
-      table += "<tr><th>" + data[i].title + " -- Post ID: " + data[i].id + "</th></tr>";
+      table += "<tr><th>" + data[i].title + " -- Poster: " + data[i].poster + " -- Post ID: " + data[i].id + "</th></tr>";
       table += "<tr><td>" + data[i].body + "</td></tr>";
       if (data[i].rating){
         x = userPostRating(data[i].id);
