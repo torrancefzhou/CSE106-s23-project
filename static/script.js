@@ -39,8 +39,8 @@ function getFollowedPosts() {
         }
       }
       else{
-        table += "<tr><td><button class=\"button button1\" onclick='addPostRating(" + data[i].id + ", 1)'>" + "Like " + data[i].likes + "</button>";
-        table += "<button class=\"button button2\" onclick='addPostRating(" + data[i].id + ", 2)'>" + "Dislike " + data[i].dislikes + "</button>";
+        table += "<tr><td><button type=\"button\" class=\"button button1\" onclick='addPostRating(" + data[i].id + ", 1)'>" + "Like " + data[i].likes + "</button>";
+        table += "<button type=\"button\" class=\"button button2\" onclick='addPostRating(" + data[i].id + ", 2)'>" + "Dislike " + data[i].dislikes + "</button>";
       }
       
       table += "<button onclick='seeComments(\"" + data[i].id + "\")'>" + "See Comments " + data[i].comments + "</button></td></tr>"
@@ -75,6 +75,10 @@ function getAllPosts() {
         else if(x == "2"){
           table += "<tr><td><button class=\"button button1\" onclick='changetoLike(\"" + data[i].id + "\")'>" + "Like " + data[i].likes + "</button>";
           table += "<button class=\"button button2active\" onclick='removeDislike(\"" + data[i].id + "\")'>" + "Dislike " + data[i].dislikes + "</button>";
+        }
+        else {
+          table += "<tr><td><button class=\"button button1\" onclick='addPostRating(" + data[i].id + ", 1)'>" + "Like " + data[i].likes + "</button>";
+          table += "<button class=\"button button2\" onclick='addPostRating(" + data[i].id + ", 2)'>" + "Dislike " + data[i].dislikes + "</button>";
         }
       }
       else{
@@ -162,22 +166,37 @@ function userPostRating(postID) {
   };
 }
 
+// keep track of the posts that the user has rated
+const userRatedPosts = {};
+
 function addPostRating(postID, rating) {
+  if (userRatedPosts[postID] === rating) {
+    // user has already rated this post with the same rating
+    deletePostRating(postID);
+    return;
+  }
   var xhttp = new XMLHttpRequest();
   xhttp.open("POST", "/posts/" + postID + "/rating/" + rating);
   xhttp.send();
   xhttp.onload = function() {
-    getAllPosts()
+    userRatedPosts[postID] = rating;
+    getAllPosts();
   };
 }
 
 function deletePostRating(postID) {
+  var currentRating = userRatedPosts[postID];
+  if (!currentRating) {
+    // user has not rated this post
+    return;
+  }
   var xhttp = new XMLHttpRequest();
   xhttp.open("DELETE", "/posts/" + postID + "/rating");
   xhttp.onload = function() {
       var response = JSON.parse(this.responseText);
       if (response.success) {
-        getAllPosts()
+        delete userRatedPosts[postID];
+        getAllPosts();
       } else {
         alert(response.message);
     }
@@ -186,16 +205,23 @@ function deletePostRating(postID) {
 }
 
 function editPostRating(postID, rating) {
+  if (userRatedPosts[postID] === rating) {
+    // user has already rated this post with the same rating
+    deletePostRating(postID);
+    return;
+  }
   var xhttp = new XMLHttpRequest();
   xhttp.open("PUT", "/posts/" + postID + "/rating");
   xhttp.setRequestHeader("Content-Type", "application/json");
   const body = {"rating": rating};
   xhttp.send(JSON.stringify(body));
   xhttp.onload = function() {
-      getAllPosts()
+      userRatedPosts[postID] = rating;
+      getAllPosts();
       alert("Rating changed successfully")
   };
 }
+
 
 
 function addCommentRating(postID, commentID, rating) {
