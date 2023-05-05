@@ -324,7 +324,7 @@ form.user_info_form {
     font-family: sans-serif;
 }
 
-.post, .comment {
+.post, .comment, .new_comment {
     display: flex;
     flex-direction: column;
     width: calc(100% - 2rem);
@@ -342,7 +342,7 @@ form.user_info_form {
     display: inline-block;
 }
 
-.post .post_title {
+.post .post_title, .new_comment label {
     display: block;
     font-size: 1.5rem;
     padding: .5rem .75rem;
@@ -392,4 +392,27 @@ form.user_info_form {
 .likes, .dislikes {
     display: inline-block;
     margin: 0 .25rem;
+}
+
+.new_comment {
+    box-sizing: border-box;
+}
+.new_comment label {
+    background-color: rgba(0, 0, 0, .1)
+}
+.new_comment textarea {
+    width: calc(100% - 1rem);
+    font-family: sans-serif;
+    font-size: 1rem;
+    box-sizing: border-box;
+    height: 4rem;
+    resize: vertical;
+    margin: .5rem;
+    padding: .5rem;
+}
+.new_comment button {
+    padding: .25rem .5rem;
+    font-size: 1rem;
+    width: 8rem;
+    margin: 0 .5rem .5rem .5rem;
 }
