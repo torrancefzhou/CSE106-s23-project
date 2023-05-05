@@ -187,8 +187,8 @@ def login():
 @app.route('/postsby/<username>', methods=['GET'])
 @login_required
 def userPosts(username):
-    data = User.query.filter_by(username=username).first()
-    data = Posts.query.filter_by(user_id=data.id).all()
+    tempData = User.query.filter_by(username=username).first()
+    data = Posts.query.filter_by(user_id=tempData.id).all()
     return jsonify([{"title": item.title,
                     "id": item.id,
                     "body": item.body,
@@ -205,7 +205,8 @@ def allPosts():
                      "body": item.body,
                      "likes": item.likes,
                      "dislikes": item.dislikes,
-                     "comments": item.comments} for item in data])
+                     "comments": item.comments,
+                     "rating": Ratings.query.filter_by(post_id=item.id, user_id=current_user.id).count() > 0} for item in data])
 
 
 @app.route("/posts", methods=['POST'])
@@ -234,9 +235,22 @@ def deletePost():
         return jsonify({'success': True})
     else:
         return jsonify({'success': False})
-
-
+    
 @app.route('/posts/<postID>', methods=['GET'])
+@login_required
+def postbyID(postID):
+        data = Posts.query.filter_by(id=postID).first()
+
+        return jsonify([{"title": data.title,
+                     "id": data.id,
+                     "body": data.body,
+                     "likes": data.likes,
+                     "dislikes": data.dislikes,
+                     "comments": data.comments,
+                     "rating": Ratings.query.filter_by(post_id=data.id, user_id=current_user.id).count() > 0}])
+
+
+@app.route('/posts/<postID>/comments', methods=['GET'])
 @login_required
 def seeComments(postID):
         temp = Posts.query.filter_by(id=postID).first()
@@ -247,7 +261,7 @@ def seeComments(postID):
                      "dislikes": item.dislikes} for item in data])
 
 
-@app.route("/posts/<postID>", methods=['POST'])
+@app.route("/posts/<postID>/comments", methods=['POST'])
 @login_required
 def addComment(postID):
     # add Comment
@@ -259,7 +273,7 @@ def addComment(postID):
     return 'Created new Post'
 
 
-@app.route("/posts/<postID>", methods=['DELETE'])
+@app.route("/posts/<postID>/comments", methods=['DELETE'])
 @login_required
 def deleteComment(postID):
     # delete Comment
@@ -270,14 +284,24 @@ def deleteComment(postID):
         return jsonify({'success': True})
     else:
         return jsonify({'success': False})
-
-
-@app.route("/posts/<postID>/rating", methods=['POST'])
+    
+@app.route('/posts/<postID>/rating', methods=['GET'])
 @login_required
-def addPostRating(postID):
-    body = request.get_json()
-    rating = body['rating']
+def getUserRating(postID):
+        data = Ratings.query.filter_by(post_id=postID, user_id=current_user.id).first()
 
+        return jsonify({"rating": data.rating})
+
+
+@app.route("/posts/<postID>/rating/<rating>", methods=['POST'])
+@login_required
+def addPostRating(postID, rating):
+    orig_post = Posts.query.filter_by(id=postID).first()
+    if rating == "1":
+        orig_post.likes += 1
+    elif rating == "2":
+        orig_post.dislikes += 1
+    
     newRating = Ratings(user_id=current_user.id, post_id=postID, rating=rating)
     db.session.add(newRating)
     db.session.commit()
@@ -287,10 +311,16 @@ def addPostRating(postID):
 @app.route("/posts/<postID>/rating", methods=['DELETE'])
 @login_required
 def deletePostRating(postID):
-    post = Posts.query.filter_by(id=postID).first()
-    rating = Ratings.query.filter_by(user_id=current_user.id, post_id=post.id).first()
-    if rating:
-        db.session.delete(rating)
+    orig_post = Posts.query.filter_by(id=postID).first()
+    rate = Ratings.query.filter_by(user_id=current_user.id, post_id=orig_post.id).first()
+
+    if rate.rating == 1:
+        orig_post.likes -= 1
+    elif rate.rating == 2:
+        orig_post.dislikes -= 1
+
+    if rate:
+        db.session.delete(rate)
         db.session.commit()
         return jsonify({'success': True})
     else:
@@ -301,11 +331,19 @@ def deletePostRating(postID):
 @login_required
 def editPostRating(postID):
     body = request.get_json()
-    rating = body['rating']
+    rate= body['rating']
     post = Posts.query.filter_by(id=postID).first()
     rate_obj = Ratings.query.filter_by(user_id=current_user.id, post_id=post.id).first()
+
+    if rate == 1:
+        post.likes += 1
+        post.dislikes -= 1
+    elif rate == 2:
+        post.likes -= 1
+        post.dislikes += 1
+
     if rate_obj:
-        rate_obj.rating = rating
+        rate_obj.rating = rate
         db.session.commit()
         return jsonify({'success': True})
     else:
