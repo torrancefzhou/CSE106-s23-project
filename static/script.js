@@ -102,8 +102,8 @@ function seeComments(postID) {
 
     for (var i = 0; i < data.length; i++) {
       table += "<tr><td>" + data[i].body + "</td></tr>";
-      table += "<tr><td><button class=\"button button1\" onclick='addLike(\"" + data[i].id + "\")'>" + "Like " + data[i].likes + "</button>";
-      table += "<button class=\"button button2\" onclick='addDislike(\"" + data[i].id + "\")'>" + "Dislike " + data[i].dislikes + "</button></td></tr>";
+      table += "<tr><td><button class=\"button button1\" onclick='addCommentRating(" + postID + ", " + data[i].id + ", 1)'>" + "Like " + data[i].likes + "</button>";
+      table += "<button class=\"button button2\" onclick='addCommentRating(" + postID + ", " + data[i].id + ", 2)'>" + "Dislike " + data[i].dislikes + "</button></td></tr>";
       table += "<tr class='blank'><td class='blank'></td></tr>";
     }
     document.getElementById("comments-container").innerHTML = table;
@@ -128,17 +128,17 @@ function addPostRating(postID, rating) {
   xhttp.open("POST", "/posts/" + postID + "/rating/" + rating);
   xhttp.send();
   xhttp.onload = function() {
-    getAllPosts();
+    getAllPosts()
   };
 }
 
-function dropCourse(postID) {
+function deletePostRating(postID) {
   var xhttp = new XMLHttpRequest();
   xhttp.open("DELETE", "/posts/" + postID + "/rating");
   xhttp.onload = function() {
       var response = JSON.parse(this.responseText);
       if (response.success) {
-        getAllPosts();
+        getAllPosts()
       } else {
         alert(response.message);
     }
@@ -153,6 +153,43 @@ function editPostRating(postID, rating) {
   const body = {"rating": rating};
   xhttp.send(JSON.stringify(body));
   xhttp.onload = function() {
+      getAllPosts()
+      alert("Rating changed successfully")
+  };
+}
+
+
+function addCommentRating(postID, commentID, rating) {
+  var xhttp = new XMLHttpRequest();
+  xhttp.open("POST", "/posts/" + postID + "/" + commentID + "/rating/" + rating);
+  xhttp.send();
+  xhttp.onload = function() {
+    getPostbyID(postID)
+  };
+}
+
+function deleteCommentRating(postID, commentID) {
+  var xhttp = new XMLHttpRequest();
+  xhttp.open("DELETE", "/posts/" + postID + "/" + commentID + "/rating");
+  xhttp.onload = function() {
+      var response = JSON.parse(this.responseText);
+      if (response.success) {
+        getPostbyID(postID)
+      } else {
+        alert(response.message);
+    }
+  };
+  xhttp.send();
+}
+
+function editCommentRating(postID, commentID, rating) {
+  var xhttp = new XMLHttpRequest();
+  xhttp.open("PUT", "/posts/" + postID + "/" + commentID + "/rating");
+  xhttp.setRequestHeader("Content-Type", "application/json");
+  const body = {"rating": rating};
+  xhttp.send(JSON.stringify(body));
+  xhttp.onload = function() {
+      getPostbyID(postID)
       alert("Rating changed successfully")
   };
 }

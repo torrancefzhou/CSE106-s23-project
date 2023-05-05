@@ -257,6 +257,7 @@ def seeComments(postID):
         data = Comments.query.filter_by(post_id=temp.id).all()
 
         return jsonify([{"body": item.body,
+                     "id": item.id,
                      "likes": item.likes,
                      "dislikes": item.dislikes} for item in data])
 
@@ -350,12 +351,15 @@ def editPostRating(postID):
         return jsonify({'success': False})
 
 
-@app.route("/posts/<postID>/<commentID>/rating", methods=['POST'])
+@app.route("/posts/<postID>/<commentID>/rating/<rating>", methods=['POST'])
 @login_required
-def addCommentRating(postID, commentID):
-    body = request.get_json()
-    rating = body['rating']
-
+def addCommentRating(postID, commentID, rating):
+    orig_comment = Comments.query.filter_by(id=commentID).first()
+    if rating == "1":
+        orig_comment.likes += 1
+    elif rating == "2":
+        orig_comment.dislikes += 1
+    
     newRating = Ratings(user_id=current_user.id, comment_id=commentID, rating=rating)
     db.session.add(newRating)
     db.session.commit()
@@ -365,10 +369,16 @@ def addCommentRating(postID, commentID):
 @app.route("/posts/<postID>/<commentID>/rating", methods=['DELETE'])
 @login_required
 def deleteCommentRating(postID, commentID):
-    comment = Comments.query.filter_by(post_id=postID, id=commentID).first()
-    rating = Ratings.query.filter_by(user_id=current_user.id, comment_id=comment.id).first()
-    if rating:
-        db.session.delete(rating)
+    orig_comment = Comments.query.filter_by(id=commentID).first()
+    rate = Ratings.query.filter_by(user_id=current_user.id, comment_id=commentID).first()
+
+    if rate.rating == 1:
+        orig_comment.likes -= 1
+    elif rate.rating == 2:
+        orig_comment.dislikes -= 1
+
+    if rate:
+        db.session.delete(rate)
         db.session.commit()
         return jsonify({'success': True})
     else:
@@ -379,11 +389,19 @@ def deleteCommentRating(postID, commentID):
 @login_required
 def editCommentRating(postID, commentID):
     body = request.get_json()
-    rating = body['rating']
-    comment = Comments.query.filter_by(post_id=postID, id=commentID).first()
-    rate_obj = Ratings.query.filter_by(user_id=current_user.id, comment_id=comment.id).first()
-    if rate_obj:
-        rate_obj.rating = rating
+    rate = body['rating']
+    comment = Comments.query.filter_by(id=commentID).first()
+    rating = Ratings.query.filter_by(user_id=current_user.id, comment_id=commentID).first()
+
+    if rate == 1:
+        comment.likes += 1
+        comment.dislikes -= 1
+    elif rate == 2:
+        comment.likes -= 1
+        comment.dislikes += 1
+
+    if rating:
+        rating.rating = rate
         db.session.commit()
         return jsonify({'success': True})
     else:
