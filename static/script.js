@@ -175,6 +175,11 @@ function addPostRating(postID, rating) {
     deletePostRating(postID);
     return;
   }
+  if (userRatedPosts[postID] !== undefined) {
+    // user has already rated this post with a different rating
+    editPostRating(postID, rating);
+    return;
+  }
   var xhttp = new XMLHttpRequest();
   xhttp.open("POST", "/posts/" + postID + "/rating/" + rating);
   xhttp.send();
@@ -221,6 +226,23 @@ function editPostRating(postID, rating) {
       alert("Rating changed successfully")
   };
 }
+
+function handleRatingButtonClick(postID, rating) {
+  const otherRating = rating === "like" ? "dislike" : "like";
+  const ratingButton = document.getElementById(postID + "-" + rating + "-button");
+  const otherRatingButton = document.getElementById(postID + "-" + otherRating + "-button");
+  if (ratingButton.classList.contains("selected")) {
+    // unselect the rating
+    ratingButton.classList.remove("selected");
+    deletePostRating(postID);
+  } else {
+    // select the rating and unselect the other
+    ratingButton.classList.add("selected");
+    otherRatingButton.classList.remove("selected");
+    addPostRating(postID, rating);
+  }
+}
+
 
 
 
