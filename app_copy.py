@@ -28,6 +28,9 @@ class User(UserMixin, db.Model):
     posts = db.relationship('Posts', backref='user')
     comments = db.relationship('Comments', backref='user')
 
+    followers = db.relationship('Follows', backref='followers', foreign_keys='Follows.user_id')
+    followed = db.relationship('Follows', backref='followed', foreign_keys='Follows.followed_id')
+
     def __repr__(self):
         return '<User %r>' % self.username
     
@@ -63,7 +66,6 @@ class Comments(db.Model):
     likes = db.Column(db.Integer)
     dislikes = db.Column(db.Integer)
     
-
     rating = db.relationship('Ratings', backref='post')
 
     def __repr__(self):
@@ -76,9 +78,14 @@ class Ratings(db.Model):
     comment_id = db.Column(db.Integer, db.ForeignKey('comments.id'))
     rating = db.Column(db.Integer) #0 Neutral, 1 Liked, 2 Disliked
 
+class Follows(db.Model):
+    id = db.Column(db.Integer, unique=True, primary_key=True, nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    followed_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    followed_date = db.Column(db.DateTime, nullable=False)
 
 with app.app_context():
-    #db.drop_all() # resets tables between instances, do this if you change table models
+    # db.drop_all() # resets tables between instances, do this if you change table models
     db.create_all()
 
 def can_access_admin_db():
@@ -133,6 +140,16 @@ class RatingModelView(sqla.ModelView):
         # redirect to login page if user doesn't have access
         return redirect(url_for('login', next=request.url))
 
+class FollowModelView(sqla.ModelView):
+    column_hide_backrefs = False
+    column_list = [c_attr.key for c_attr in inspect(Follows).mapper.column_attrs]
+
+    def is_accessible(self):
+        return can_access_admin_db()
+
+    def inaccessible_callback(self, name, **kwargs):
+        # redirect to login page if user doesn't have access
+        return redirect(url_for('login', next=request.url))
 
 class LogoutMenuLink(MenuLink):
     def is_accessible(self):
@@ -147,6 +164,7 @@ admin.add_view(UserModelView(User, db.session))
 admin.add_view(PostModelView(Posts, db.session))
 admin.add_view(CommentModelView(Comments, db.session))
 admin.add_view(RatingModelView(Ratings, db.session))
+admin.add_view(FollowModelView(Follows, db.session))
 admin.add_link(LoginMenuLink(name='Return to Login Page', category='', url="/login"))
 admin.add_link(LogoutMenuLink(name='Return to Homepage', category='', url="/index"))
 admin.add_link(LogoutMenuLink(name='Logout', category='', url="/logout"))
@@ -158,6 +176,26 @@ login_manager.login_view = 'login'
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(user_id)
+
+def post_to_json(item):
+    return jsonify({"title": item.title,
+                    "id": item.id,
+                    "body": item.body,
+                    "likes": item.likes,
+                    "dislikes": item.dislikes,
+                    "comments": item.comments,
+                    "rating": 0 if not current_user.is_authenticated else 
+                    Ratings.query.filter_by(post_id=item.id, user_id=current_user.id).count() > 0})
+
+def posts_to_json(data):
+    return jsonify([{"title": item.title,
+                    "id": item.id,
+                    "body": item.body,
+                    "likes": item.likes,
+                    "dislikes": item.dislikes,
+                    "comments": item.comments,
+                    "rating": 0 if not current_user.is_authenticated else 
+                    Ratings.query.filter_by(post_id=item.id, user_id=current_user.id).count() > 0} for item in data])
 
 @app.route('/index')
 @app.route('/')
@@ -185,30 +223,21 @@ def login():
     return redirect(url_for('index'))
 
 @app.route('/postsby/<username>', methods=['GET'])
-@login_required
 def userPosts(username):
     tempData = User.query.filter_by(username=username).first()
     data = Posts.query.filter_by(user_id=tempData.id).all()
-    return jsonify([{"title": item.title,
-                    "id": item.id,
-                    "body": item.body,
-                    "likes": item.likes,
-                    "dislikes": item.dislikes,
-                    "comments": item.comments} for item in data])
+    return posts_to_json(data)
 
 @app.route('/allposts', methods=['GET'])
 # @login_required 
 def allPosts():
     data = Posts.query.all()
-    return jsonify([{"title": item.title,
-                "id": item.id,
-                "body": item.body,
-                "likes": item.likes,
-                "dislikes": item.dislikes,
-                "comments": item.comments,
-                "rating": 0 if not current_user.is_authenticated else 
-                Ratings.query.filter_by(post_id=item.id, user_id=current_user.id).count() > 0} for item in data])
+    return posts_to_json(data)
 
+@app.route('/page/<postID>', methods=["GET"])
+def postPage(postID):
+    # TODO: return data of the post for jinja template
+    return render_template("post_page.html", postInfo=None)
 
 @app.route("/posts", methods=['POST'])
 @login_required
@@ -220,7 +249,8 @@ def addPost():
     newPost = Posts(user_id=current_user.id, title=title, body=tempbody, likes=0, dislikes=0, comments=0)
     db.session.add(newPost)
     db.session.commit()
-    return 'Created new Post'
+    postID = newPost.id
+    return redirect("/page/" + postID)
 
 
 @app.route("/posts", methods=['DELETE'])
@@ -240,15 +270,7 @@ def deletePost():
 @app.route('/posts/<postID>', methods=['GET'])
 def postbyID(postID):
     data = Posts.query.filter_by(id=postID).first()
-    return jsonify([{"title": data.title,
-                    "id": data.id,
-                    "body": data.body,
-                    "likes": data.likes,
-                    "dislikes": data.dislikes,
-                    "comments": data.comments,
-                    "rating": 0 if not current_user.is_authenticated else 
-                    Ratings.query.filter_by(post_id=data.id, user_id=current_user.id).count() > 0}])
-
+    return post_to_json(data)
 
 @app.route('/posts/<postID>/comments', methods=['GET'])
 @login_required
