@@ -175,6 +175,14 @@ login_manager.login_view = 'login'
 def load_user(user_id):
     return User.query.get(user_id)
 
+def get_followed_posts():
+    tempData = Followed.query.filter_by(user_id=current_user.id).all()
+    data = Posts.query.filter_by(id='missing').all()
+    for x in tempData:
+        temp = Posts.query.filter_by(user_id=x.followed_id).all()
+        for y in temp:
+            data.append(y)
+    return data
 
 def post_data(item):
     return {"title": item.title,
@@ -205,6 +213,10 @@ def comment_data(item):
 def index(): # put application's code here
     if current_user.is_authenticated and current_user.is_admin:
         return render_template('admin_index.html')
+    elif current_user.is_authenticated:
+        return render_template('index.html', 
+                               posts=[post_data(item) for item in Posts.query.all()], 
+                               followed=[post_data(item) for item in get_followed_posts()])
     else:
         return render_template('index.html', posts=[post_data(item) for item in Posts.query.all()])
 
@@ -279,13 +291,7 @@ def postbyID(postID):
 
 @app.route('/followed', methods=['GET'])
 def followedPosts():
-    tempData = Followed.query.filter_by(user_id=current_user.id).all()
-    data = Posts.query.filter_by(id='missing').all()
-    for x in tempData:
-        temp = Posts.query.filter_by(user_id=x.followed_id).all()
-        for y in temp:
-            data.append(y)
-    return posts_to_json(data)
+    return posts_to_json(get_followed_posts())
 
 
 @app.route('/posts/<postID>/comments', methods=['GET'])

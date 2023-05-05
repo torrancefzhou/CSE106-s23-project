@@ -11,19 +11,40 @@
     <h1 class="big-title">Savanna Home</h1>
 
     <script src="{{ url_for('static',filename='script.js') }}"></script>
+    <script>
+        function showAllPosts() {
+            document.getElementById("all_posts").classList.remove("hidden");
+            document.getElementById("followed_posts").classList.add("hidden");
+            document.getElementById("allHeader").classList.add("active");
+            document.getElementById("followedHeader").classList.remove("active");
+        }
+        function showFollowedPosts() {
+            document.getElementById("all_posts").classList.add("hidden");
+            document.getElementById("followed_posts").classList.remove("hidden");
+            document.getElementById("allHeader").classList.remove("active");
+            document.getElementById("followedHeader").classList.add("active");
+        }
+    </script>
 
     <div class="box">
         <ul>
-            <li id="head1" style="width:50%"><a id="header1" onclick="getFollowedPosts()">Followed Posts</a></li>
-            <li id="head2" style="width:50%"><a id="header2" onclick="getAllPosts()" class="active">All Posts</a></li>
+            <li id="head2" style="width:50%"><a href="#" id="allHeader" onclick="showAllPosts()" class="active">All Posts</a></li>
+            <li id="head1" style="width:50%"><a href="#" id="followedHeader" onclick="showFollowedPosts()">Followed Posts</a></li>
         </ul>
-        <div id="posts-container">
-        
-        </div>
-        <div class="all_posts">
+        <div id="all_posts">
             {% for postInfo in posts %}
                 {% include 'post.html' %}
             {% endfor %} 
+        </div>
+        <div id="followed_posts" class="hidden">
+            {% for postInfo in followed %}
+                {% include 'post.html' %}
+            {% endfor %}
+            {% if not current_user.is_authenticated %}
+                <div style="padding: 1rem">You aren't logged in!</div>
+            {% elif not followed %}
+                <div style="padding: 1rem">No followed posts! Try following more users.</div>
+            {% endif %}
         </div>
         <!--
         <div id="comments-container"></div>

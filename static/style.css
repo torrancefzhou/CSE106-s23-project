@@ -416,3 +416,7 @@ form.user_info_form {
     width: 8rem;
     margin: 0 .5rem .5rem .5rem;
 }
+
+.hidden {
+    display: none;
+}
