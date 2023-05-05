@@ -470,7 +470,8 @@ def register():
 @app.route("/users/<username>", methods=["GET"])
 def profile_page(username):
     if User.query.filter_by(username=username).first():
-        return render_template("profile_page.html", username=username)
+        id = User.query.filter_by(username=username).first().id
+        return render_template("profile_page.html", username=username, posts=[post_data(item) for item in Posts.query.filter_by(user_id=id)])
     return "User does not exist", 404
 
 @app.route("/new_post", methods=["GET"])
