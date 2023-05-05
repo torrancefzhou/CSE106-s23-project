@@ -43,7 +43,7 @@ class Posts(db.Model):
     body = db.Column(db.String) # e.g. "TR 3:00PM - 4:15PM"
     likes = db.Column(db.Integer) # e.g. 4 (/10)
     dislikes = db.Column(db.Integer) # e.g. (4/) 10
-    # comments = db.Column(db.Integer)
+    comments = db.Column(db.Integer)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False) # e.g. "1001"
     # instructor = db.relationship('Account', backref=db.backref('teacher', lazy=True))
 
@@ -183,7 +183,7 @@ def post_data(item):
             "poster": (User.query.filter_by(id=item.user_id).first()).username,
             "likes": item.likes,
             "dislikes": item.dislikes,
-            "comments": (Comments.query.filter_by(post_id=item.id)).count(),
+            "comments": item.comments,
             "rating": 0 if not current_user.is_authenticated else 
             Ratings.query.filter_by(post_id=item.id, user_id=current_user.id).count() > 0}
 

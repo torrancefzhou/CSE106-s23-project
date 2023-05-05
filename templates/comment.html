@@ -1,9 +1,9 @@
 <div class="comment">
-    <div class="comment_author">
-        {{commentInfo.commentor}}
-    </div>
+    <a href="/users/{{commentInfo.commentor}}" class="comment_author">
+        AUTHOR: {{commentInfo.commentor}}
+    </a>
     <div class="comment_body">
-        {{commentInfo.body}}
+        COMMENT: {{commentInfo.body}}
     </div>
     <div class="comment_footer">
         <div class="comment_rating">
@@ -17,5 +17,6 @@
             </div>
         </div>
         <button class="comment_follow">Follow Commentor</button>
+        <!-- TODO: dynamically change these buttons based on current status -->
     </div>
 </div>
