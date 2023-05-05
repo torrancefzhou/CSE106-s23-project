@@ -63,7 +63,6 @@ class Comments(db.Model):
     likes = db.Column(db.Integer)
     dislikes = db.Column(db.Integer)
     
-
     rating = db.relationship('Ratings', backref='post')
 
     def __repr__(self):
@@ -85,7 +84,7 @@ class Followed(db.Model):
 
 
 with app.app_context():
-    #db.drop_all() # resets tables between instances, do this if you change table models
+    # db.drop_all() # resets tables between instances, do this if you change table models
     db.create_all()
 
 def can_access_admin_db():
@@ -178,6 +177,26 @@ login_manager.login_view = 'login'
 def load_user(user_id):
     return User.query.get(user_id)
 
+def post_to_json(item):
+    return jsonify({"title": item.title,
+                    "id": item.id,
+                    "body": item.body,
+                    "likes": item.likes,
+                    "dislikes": item.dislikes,
+                    "comments": item.comments,
+                    "rating": 0 if not current_user.is_authenticated else 
+                    Ratings.query.filter_by(post_id=item.id, user_id=current_user.id).count() > 0})
+
+def posts_to_json(data):
+    return jsonify([{"title": item.title,
+                    "id": item.id,
+                    "body": item.body,
+                    "likes": item.likes,
+                    "dislikes": item.dislikes,
+                    "comments": item.comments,
+                    "rating": 0 if not current_user.is_authenticated else 
+                    Ratings.query.filter_by(post_id=item.id, user_id=current_user.id).count() > 0} for item in data])
+
 @app.route('/index')
 @app.route('/')
 def index(): # put application's code here
@@ -204,16 +223,10 @@ def login():
     return redirect(url_for('index'))
 
 @app.route('/postsby/<username>', methods=['GET'])
-@login_required
 def userPosts(username):
     tempData = User.query.filter_by(username=username).first()
     data = Posts.query.filter_by(user_id=tempData.id).all()
-    return jsonify([{"title": item.title,
-                    "id": item.id,
-                    "body": item.body,
-                    "likes": item.likes,
-                    "dislikes": item.dislikes,
-                    "comments": item.comments} for item in data])
+    return posts_to_json(data)
 
 @app.route('/allposts', methods=['GET'])
 # @login_required 
@@ -229,6 +242,10 @@ def allPosts():
                 "rating": 0 if not current_user.is_authenticated else 
                 Ratings.query.filter_by(post_id=item.id, user_id=current_user.id).count() > 0} for item in data])
 
+@app.route('/page/<postID>', methods=["GET"])
+def postPage(postID):
+    # TODO: return data of the post for jinja template
+    return render_template("post_page.html", postInfo=None)
 
 @app.route("/posts", methods=['POST'])
 @login_required
@@ -240,7 +257,8 @@ def addPost():
     newPost = Posts(user_id=current_user.id, title=title, body=tempbody, likes=0, dislikes=0, comments=0)
     db.session.add(newPost)
     db.session.commit()
-    return 'Created new Post'
+    postID = newPost.id
+    return redirect("/page/" + postID)
 
 
 @app.route("/posts", methods=['DELETE'])
