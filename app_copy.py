@@ -305,6 +305,7 @@ def addComment(postID):
     body = request.form
     tempbody = body['body']
     newComment = Comments(user_id=current_user.id, post_id=postID, body=tempbody, likes=0, dislikes=0)
+    Posts.query.filter_by(id=postID).first().comments += 1
     db.session.add(newComment)
     db.session.commit()
     return redirect("/page/" + str(postID))

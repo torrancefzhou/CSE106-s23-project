@@ -1,26 +1,19 @@
 <div class="post">
     <a href="/page/{{postInfo.id}}" class="post_title">
-        TITLE: {{postInfo.title}}
+        {{postInfo.title}}
     </a>
-    <a href="/users/{{postInfo.poster}}" class="post_author">
-        AUTHOR: {{postInfo.poster}}
-    </a>
+    
     <div class="post_body">
-        CONTENT: {{postInfo.body}}
+        {{postInfo.body}}
     </div> 
     <div class="post_footer">
         <div class="post_rating">
-            <div class="post_upvote">
-                <button>Like</button>
-                +{{postInfo.likes}}
-            </div>
-            <div class="post_downvote">
-                -{{postInfo.dislikes}}
-                <button>Dislike</button>
-            </div>
+            <div class="post_upvote"><button>Like</button><div class="likes">+{{postInfo.likes}}</div></div>
+            <div class="post_downvote"><div class="dislikes">-{{postInfo.dislikes}}</div><button>Dislike</button></div>
         </div>
-        <a href="/page/{{postInfo.id}}" class="post_comments">View {{postInfo.comments}} comments</a>
-        <button class="post_follow">Follow Author</button>
+        <a href="/page/{{postInfo.id}}" class="post_comments"><div class="comments">View {{postInfo.comments}} comments</div></a>
+        <a href="/users/{{postInfo.poster}}" class="post_author"><div class="author">by: {{postInfo.poster}}</div></a>
+        <button class="post_follow">Follow Poster</button>
         <!-- TODO: dynamically change these buttons based on current status -->
     </div>
 </div>

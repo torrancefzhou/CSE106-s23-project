@@ -325,61 +325,71 @@ form.user_info_form {
 }
 
 .post, .comment {
-    display: block;
+    display: flex;
+    flex-direction: column;
     width: calc(100% - 2rem);
-    background-color: white;
+    background-color: #eee;
     position: relative;
-    margin: auto 1rem;
+    margin: 1rem;
     text-align: left;
 }
 
-.post .post_rating, .comment .comment_rating {
-    background-color:red;
-    display: inline-block;
-    width: auto;
-    text-align: center;
-    font-weight: 700;
-    padding: 0 .25rem;
+.post a, .comment a {
+    text-decoration: none;
 }
 
 .post button, .comment button {
     display: inline-block;
 }
 
-.post .post_upvote, .comment .comment_upvote {
-    display: inline-block;
-    background-color: green;
-    padding: .25rem;
-}
-.post .post_downvote, .comment .comment_downvote {
-    display: inline-block;
-    background-color: pink;
-    padding: .25rem;
-}
-
 .post .post_title {
     display: block;
-    background-color: yellow;
-    padding: .25rem;
-}
-.post .post_author, .comment .comment_author {
-    display: block;
-    background-color: greenyellow;
-    padding: .25rem;
-}
-.post .post_body, .comment .comment_body {
-    background-color: goldenrod;
-    padding: .25rem;
-}
-.post .post_footer, .comment .comment_footer {
-    width: 100%;
-    display: block;
-    background-color: blue;
+    font-size: 1.5rem;
+    padding: .5rem .75rem;
+    background-color: rgba(0, 0, 0, .1);
 }
 
-.post .post_footer .post_comments, 
-.post .post_footer .post_follow,
-.comment .comment_footer .comment_follow {
+.post .post_footer, .comment .comment_footer {
+    width: 100%;
+    display: flex;
+    background-color: rgba(0, 0, 0, .1);
+}
+.post .post_author, .comment .comment_author, .filler {
+    display: inline-block;
+    font-size: 1rem;
+    padding: .375rem .5rem;
+    background-color: rgba(0, 0, 0, .1);
+    width: auto;
+    flex-grow: 1;   
+}
+.post .post_body, .comment .comment_body {
+    padding: 1rem;
+}
+.post .post_footer .post_comments {
+    display: inline-block;
+    padding: .375rem .5rem;
+}
+.post .post_rating, .comment .comment_rating {
+    display: inline-block;
+    width: auto;
+    text-align: center;
+    font-weight: 700;
+    margin: 0;
+    background-color: rgba(0, 0, 0, .1)
+}
+.post .post_upvote, .comment .comment_upvote {
+    background-color:lightgreen;
     display: inline-block;
     padding: .25rem;
+    margin: 0;
+}
+.post .post_downvote, .comment .comment_downvote {
+    background-color:lightcoral;
+    display: inline-block;
+    padding: .25rem;
+    margin: 0;
+}
+.likes, .dislikes {
+    display: inline-block;
+    margin: 0 .25rem;
 }
