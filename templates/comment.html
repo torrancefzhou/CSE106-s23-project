@@ -8,13 +8,17 @@
     </div>
     <div class="comment_footer">
         <div class="comment_rating">
-            <div class="comment_upvote">
-                <button onclick="addCommentRating('{{commentInfo.id}}' , 1)" type="button" class="button button1">Like</button>
-                +{{commentInfo.likes}}
+            <div class="comment_upvote {{'highlight' if commentInfo.rating == 1}}" data-value="1"
+            data-selected="{{'true' if commentInfo.rating == 1 else 'false'}}" data-id="{{commentInfo.id}}"
+            onclick="rateComment(this);">
+                <button type="button" class="button button1">Like</button>
+                {{commentInfo.likes}}
             </div>
-            <div class="comment_downvote">
-                -{{commentInfo.dislikes}}
-                <button onclick="addCommentRating('{{commentInfo.id}}' , 2)" type="button" class="button button2">Dislike</button>
+            <div class="comment_downvote {{'highlight' if commentInfo.rating == 2}}" data-value="2"
+            data-selected="{{'true' if commentInfo.rating == 2 else 'false'}}" data-id="{{commentInfo.id}}"
+            onclick="rateComment(this);">
+                {{commentInfo.dislikes}}
+                <button type="button" class="button button2">Dislike</button>
             </div>
         </div>
         <div class="filler"></div>
