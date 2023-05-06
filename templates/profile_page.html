@@ -58,7 +58,9 @@
   <div class="profile-pic"></div>
   <div class="tab">
     <button class="tablinks" onclick="openTab(event, 'posts')">Posts</button>
+    {% if username == current_user.username %}
     <button class="tablinks" onclick="openTab(event, 'profile')">Profile</button>
+    {% endif %}
   </div>
   <div id="posts" class="tabcontent">
     <h1>{{username}}'s Posts</h1>
@@ -71,6 +73,7 @@
 
   </div>
   <!-- CHECK IF THIS IS THE PROFILE PAGE OF THE LOGGED IN USER BEFORE RENDERING -->
+  {% if username == current_user.username %}
   <div id="profile" class="tabcontent">
     <!-- Display user's personal information here -->
     <form>
@@ -83,6 +86,7 @@
       <input type="submit" value="Save Changes">
     </form>
   </div>
+  {% endif %}
 
   <script>
     // Function to open tab content
