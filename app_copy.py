@@ -77,6 +77,7 @@ class Followed(db.Model):
     id = db.Column(db.Integer, unique=True, primary_key=True, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     followed_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+
     user = db.relationship("User", foreign_keys=[user_id])
     followed = db.relationship("User", foreign_keys=[followed_id])
 
@@ -189,11 +190,13 @@ def post_data(item):
             "id": item.id,
             "body": item.body,
             "poster": (User.query.filter_by(id=item.user_id).first()).username,
+            "following": False if not current_user.is_authenticated else
+                Followed.query.filter_by(user_id=current_user.id, followed_id=item.user_id).first() is not None,
             "likes": item.likes,
             "dislikes": item.dislikes,
             "comments": item.comments,
             "rating": 0 if not current_user.is_authenticated else 
-            Ratings.query.filter_by(post_id=item.id, user_id=current_user.id).count() > 0}
+                Ratings.query.filter_by(post_id=item.id, user_id=current_user.id).first()}
 
 def post_to_json(item):
     return jsonify(post_data(item))
@@ -204,9 +207,13 @@ def posts_to_json(data):
 def comment_data(item):
     return {"body": item.body,
             "commentor": (User.query.filter_by(id=item.user_id).first()).username,
+            "following": False if not current_user.is_authenticated else
+                Followed.query.filter_by(user_id=current_user.id, followed_id=item.user_id).first() is not None,
             "id": item.id,
             "likes": item.likes,
-            "dislikes": item.dislikes}
+            "dislikes": item.dislikes,
+            "rating": 0 if not current_user.is_authenticated else 
+            Ratings.query.filter_by(comment_id=item.id, user_id=current_user.id).first()}
 
 @app.route('/index')
 @app.route('/')
@@ -292,7 +299,6 @@ def postbyID(postID):
 @app.route('/followed', methods=['GET'])
 def followedPosts():
     return posts_to_json(get_followed_posts())
-
 
 @app.route('/posts/<postID>/comments', methods=['GET'])
 @login_required
@@ -480,6 +486,25 @@ def profile_page(username):
 @app.route("/new_post", methods=["GET"])
 def new_post_page():
     return render_template("new_post.html")
+
+@app.route("/follow/<username>", methods=["POST"])
+@login_required
+def toggle_follow(username):
+    desired_follow = request.json["now_following"]
+    print(username, request.json)
+    followed = User.query.filter_by(username=username).first()
+    if followed:
+        follow_object = Followed.query.filter_by(user_id=current_user.id, followed_id=followed.id).first()
+        if follow_object and (not desired_follow):
+            db.session.delete(follow_object)
+            db.session.commit()
+        elif (not follow_object) and desired_follow:
+            follow = Followed(user_id=current_user.id, followed_id=followed.id)
+            db.session.add(follow)
+            db.session.commit()
+        return jsonify({"now_following": desired_follow})
+    else:
+        return "User does not exist", 404
 
 if __name__ == "__main__":
     app.run()

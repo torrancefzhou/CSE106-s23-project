@@ -13,7 +13,13 @@
         </div>
         <a href="/page/{{postInfo.id}}" class="post_comments"><div class="comments">View {{postInfo.comments}} comments</div></a>
         <a href="/users/{{postInfo.poster}}" class="post_author"><div class="author">by: {{postInfo.poster}}</div></a>
-        <button class="post_follow">Follow Poster</button>
+        <button class="follow_button" onclick="follow_author(this);" data-author="{{postInfo.poster}}" data-following="{{postInfo.following}}">
+            {% if postInfo.following %}
+                Following
+            {% else %} 
+                Follow
+            {% endif %}
+        </button>
         <!-- TODO: dynamically change these buttons based on current status -->
     </div>
 </div>

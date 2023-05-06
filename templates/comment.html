@@ -17,7 +17,13 @@
             </div>
         </div>
         <div class="filler"></div>
-        <button class="comment_follow">Follow Commentor</button>
+        <button class="follow_button" onclick="follow_author(this);" data-author="{{commentInfo.poster}}" data-following="{{postInfo.following}}">
+            {% if commentInfo.following %}
+                Following
+            {% else %} 
+                Follow
+            {% endif %}
+        </button>
         <!-- TODO: dynamically change these buttons based on current status -->
     </div>
 </div>
