@@ -14,16 +14,12 @@
                 <button type="button" class="button button1">
                     Like
                 </button>
-                <div class="likes">
-                    {{postInfo.likes}}
-                </div>
+                <div class="likes">{{postInfo.likes}}</div>
             </div>
             <div class="post_downvote {{'highlight' if postInfo.rating == 2}}" data-value="2"
                 data-selected="{{'true' if postInfo.rating == 2 else 'false'}}" data-id="{{postInfo.id}}"
                 onclick="ratePost(this);">
-                <div class="dislikes">
-                    {{postInfo.dislikes}}
-                </div>
+                <div class="dislikes">{{postInfo.dislikes}}</div>
                 <button type="button" class="button button2">
                     Dislike
                 </button>
