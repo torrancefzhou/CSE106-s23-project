@@ -1,15 +1,26 @@
+html {
+    height: 100%;
+    font-family: sans-serif;
+}
+
 /* Main background Color */
 body {
-    background-color: rgba(52, 165, 231, 0.423);
+    background-image: linear-gradient(rgb(255, 255, 63), rgb(0, 255, 0), rgb(220, 156, 44));
+    height: 100%;
+    padding: 0;
+    margin: 0;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
 }
 
 /* Main Box content formatting */
 .box {
     text-align: center;
     background-color: white;
-    margin-top: 50px;
+    margin-top: 10px;
     margin-left: 100px;
     margin-right: 100px;
+    margin-bottom: 50px;
     border: 5px solid black;
 }
 
@@ -38,7 +49,7 @@ ul {
     margin: 0;
     padding: 0;
     overflow: hidden;
-    background-color: rgb(52, 165, 231);
+    background-color: rgba(150, 200, 250);
 }
 
 li {
@@ -74,6 +85,55 @@ li:not(#header) a:hover {
     left: 16px;
 }
 
+.button {
+    transition-duration: 0.4s;
+}
+
+.button1 {
+    background-color: white;
+    color: black;
+    border: 2px solid #4CAF50; /* Green */
+}
+
+.button1active {
+    background-color: #4CAF50;
+    color: black;
+    border: 2px solid #4CAF50; /* Green */
+}
+
+.button1:hover {
+    background-color: #4CAF50; /* Green */
+    color: white;
+}
+
+.button1active:hover {
+    background-color: white; /* Green */
+    color: #4CAF50;
+}
+
+.button2 {
+    background-color: white;
+    color: black;
+    border: 2px solid red; /* Blue */
+}
+
+.button2active {
+    background-color: red;
+    color: black;
+    border: 2px solid red;
+}
+
+.button2:hover {
+    background-color: red; /* Blue */
+    color: white;
+}
+
+.button2active:hover {
+    background-color: white;
+    color: red;
+}
+
+
 #classTable {
     font-family: Arial, Helvetica, sans-serif;
     border-collapse: collapse;
@@ -89,9 +149,10 @@ li:not(#header) a:hover {
     padding: 8px;
 }
 
-#classTable tr:nth-child(even){background-color: #f2f2f2;}
-
-#classTable tr:hover {background-color: #ddd;}
+#classTable td.blank, #classTable th.blank {
+    border: 1px solid #ffffff;
+    padding: 25px;
+}
 
 #classTable th {
     padding-top: 12px;
@@ -99,4 +160,276 @@ li:not(#header) a:hover {
     text-align: left;
     background-color: #048eaa;
     color: white;
+}
+
+#postTable {
+    font-family: Arial, Helvetica, sans-serif;
+    border-collapse: collapse;
+    width: 90%;
+    margin-top: 2.5%;
+    margin-bottom: 2.5%;
+    margin-left: 5%;
+    margin-right: 5%;
+}
+
+#postTable td, #postTable th {
+    border: 1px solid #ddd;
+    padding: 8px;
+}
+
+#postTable th {
+    padding-top: 12px;
+    padding-bottom: 12px;
+    text-align: left;
+    background-color: #048eaa;
+    color: white;
+}
+
+.user_bar {
+    font-family: sans-serif;
+
+    font-size: 1rem;
+    background-color: rgba(255, 255, 255, .6);
+
+    text-align:center;
+}
+
+.user_bar form {
+    display: inline;
+
+    padding: 0;
+    margin: 0;
+}
+
+.user_bar button {
+    background: none;
+    padding: 0;
+    border: none;
+
+    color: #069;
+    cursor: pointer;
+
+    font-size: 16px;
+    text-align: left;
+    vertical-align: baseline;
+
+    align-items: normal;
+    box-sizing: content-box;
+    height: auto;
+    perspective-origin: 0 0;
+    text-align: start;
+    transform-origin: 0 0;
+    width: auto;
+    -webkit-logical-height: 1em; /* Chrome ignores auto, so we have to use this hack to set the correct height  */
+    -webkit-logical-width: auto; /* Chrome ignores auto, but here for completeness */
+}
+
+.user_bar button:hover, .user_bar a:hover {
+    text-decoration: underline;
+}
+
+.user_bar a {
+    padding: .25rem .5rem;
+    margin: 0;
+    display: inline-block;
+    text-decoration: none;
+    
+    color: #069;
+}
+
+.register_box {
+    margin: auto;
+    padding: 1rem;
+    background-color: rgba(255, 255, 255, .6);
+    text-align: center;
+}
+
+form.user_info_form {
+    display: block;
+    width: 20rem;
+    margin: auto;
+
+    text-align: left;
+
+    font-size: 1rem;    
+    font-family: sans-serif;
+}
+
+.user_info_form label {
+    font-weight: 700;
+    display: block;
+    margin-bottom: .5rem;
+}
+
+.user_info_form input {
+    width: 100%;
+    padding: .5rem;
+
+    font-size: 1rem; 
+    font-family: sans-serif;
+}
+
+.user_info_form button {
+    padding: .5rem;
+    font-size: 1rem;
+    font-family: sans-serif;
+}
+
+.footer {
+    font-family: sans-serif;
+
+    font-size: 1rem;
+    background-color: rgba(255, 255, 255, .6);
+    padding: .25rem .5rem;
+    margin-top: 5rem;
+
+    text-align: center;
+}
+
+.new_post {
+    margin: 1rem;
+    padding: 1rem;
+    width: auto;
+}
+
+.new_post label {
+    font-weight: 700;
+    display: block;
+    margin-bottom: .5rem;
+}
+
+.new_post input {
+    width: 100%;
+    padding: .5rem;
+
+    font-size: 1rem; 
+    font-family: sans-serif;
+}
+
+.new_post textarea {
+    width: 100%;
+    padding: .5rem;
+
+    font-size: 1rem; 
+    font-family: sans-serif;
+}
+
+.new_post textarea::placeholder {
+    
+}
+
+.new_post button {
+    padding: .5rem;
+    font-size: 1rem;
+    font-family: sans-serif;
+}
+
+.post, .comment, .new_comment {
+    display: flex;
+    flex-direction: column;
+    width: calc(100% - 2rem);
+    background-color: #eee;
+    position: relative;
+    margin: 1rem;
+    text-align: left;
+}
+
+.post a, .comment a {
+    text-decoration: none;
+}
+
+.post button, .comment button {
+    display: inline-block;
+    cursor: pointer;
+}
+
+.post .post_title, .new_comment label {
+    display: block;
+    font-size: 1.5rem;
+    padding: .5rem .75rem;
+    background-color: rgba(0, 0, 0, .1);
+}
+
+.post .post_footer, .comment .comment_footer {
+    width: 100%;
+    display: flex;
+    background-color: rgba(0, 0, 0, .1);
+}
+.post .post_author, .comment .comment_author, .filler {
+    display: inline-block;
+    font-size: 1rem;
+    padding: .375rem .5rem;
+    background-color: rgba(0, 0, 0, .1);
+    width: auto;
+    flex-grow: 1;   
+}
+.post .post_body, .comment .comment_body {
+    padding: 1rem;
+}
+.post .post_footer .post_comments {
+    display: inline-block;
+    padding: .375rem .5rem;
+}
+.post .post_rating, .comment .comment_rating {
+    display: inline-block;
+    width: auto;
+    text-align: center;
+    font-weight: 700;
+    margin: 0;
+    background-color: rgba(0, 0, 0, .1)
+}
+.post .post_upvote, .comment .comment_upvote {
+    background-color:lightgreen;
+    display: inline-block;
+    padding: .25rem;
+    margin: 0;
+    cursor: pointer;
+}
+.post .post_downvote, .comment .comment_downvote {
+    background-color:lightcoral;
+    display: inline-block;
+    padding: .25rem;
+    margin: 0;
+    cursor: pointer;
+}
+.likes, .dislikes {
+    display: inline-block;
+    margin: 0 .25rem;
+}
+.likes::before {
+    content: "+";
+}
+.dislikes::before {
+    content: "-";
+}
+
+.new_comment {
+    box-sizing: border-box;
+}
+.new_comment label {
+    background-color: rgba(0, 0, 0, .1)
+}
+.new_comment textarea {
+    width: calc(100% - 1rem);
+    font-family: sans-serif;
+    font-size: 1rem;
+    box-sizing: border-box;
+    height: 4rem;
+    resize: vertical;
+    margin: .5rem;
+    padding: .5rem;
+}
+.new_comment button {
+    padding: .25rem .5rem;
+    font-size: 1rem;
+    width: 8rem;
+    margin: 0 .5rem .5rem .5rem;
+}
+
+.hidden {
+    display: none;
+}
+
+.highlight {
+    box-shadow: 0 0 2px 2px rgba(0, 0, 0, .75);
 }

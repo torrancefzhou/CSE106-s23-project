@@ -3,42 +3,62 @@
 
 <head>
     <link rel="stylesheet" href="static/style.css">
-    <title>Gradebook</title>
-    <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/1950/1950715.png">
+    <title>Savanna Home</title>
 </head>
 
 <body>
-    <table style="width:100%; height:100px">
-        <tr>
-            <td style="text-align:center; width:25%">
-                <h1 class="little-title">
-                {% if current_user.is_authenticated %}
-                    Welcome {{ current_user.name }}!
-                {% endif %}
-                </h1>
-            </td>
-            <td style="text-align:center; width:50%"><h1 class="big-title">University of California, Massachusetts</h1></td>
-            <td style="text-align:center; width:25%">
-                <form action="/logout">
-                <button type="submit">Log out</button>
-                </form>
-            </td>
-        </tr>
-    </table>
+    {% include 'header.html' %}
+    <h1 class="big-title">Savanna Home</h1>
 
     <script src="{{ url_for('static',filename='script.js') }}"></script>
-
+    <script>
+        function showAllPosts() {
+            var not_following = document.getElementsByClassName("not_following");
+            for (let i = 0; i < not_following.length; i++) {
+                not_following[i].classList.remove("hidden");
+            }
+            document.getElementById("followed_posts").classList.add("hidden");
+            document.getElementById("allHeader").classList.add("active");
+            document.getElementById("followedHeader").classList.remove("active");
+        }
+        function showFollowedPosts() {
+            var not_following = document.getElementsByClassName("not_following");
+            for (let i = 0; i < not_following.length; i++) {
+                not_following[i].classList.add("hidden");
+            }
+            document.getElementById("followed_posts").classList.remove("hidden");
+            document.getElementById("allHeader").classList.remove("active");
+            document.getElementById("followedHeader").classList.add("active");
+        }
+    </script>
 
     <div class="box">
         <ul>
-            <li style="width:50%"><a id="enrolledHeader" onclick="getStudentClasses()" class="active">Enrolled Courses</a></li>
-            <li style="width:50%"><a id="addHeader" onclick="allClasses()">Add Courses</a></li>
+            <li id="head2" style="width:50%"><a href="#" id="allHeader" onclick="showAllPosts()" class="active">All Posts</a></li>
+            <li id="head1" style="width:50%"><a href="#" id="followedHeader" onclick="showFollowedPosts()">Followed Posts</a></li>
         </ul>
-        <div id="placeholder"></div>
+        <div id="all_posts">
+            {% for postInfo in posts %}
+                {% include 'post.html' %}
+            {% endfor %} 
+        </div>
+        <div id="followed_posts" class="hidden">
+            {% if not current_user.is_authenticated %}
+                <div style="padding: 1rem">You aren't logged in!</div>
+            {% elif not followed %}
+                <div style="padding: 1rem">No followed posts! Try following more users.</div>
+            {% endif %}
+        </div>
+        <!--
+        <div id="comments-container"></div>
+        <div id="test"></div>
+        -->
     </div>
+
     <script>
-        getStudentClasses();
+        // getAllPosts();
     </script>
+
 </body>
 
 </html>

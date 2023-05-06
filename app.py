@@ -56,8 +56,6 @@ class Grades(db.Model):
     class_id = db.Column(db.Integer, db.ForeignKey('courses.id'), nullable=False)
     grade = db.Column(db.Integer)
 
-
-
 with app.app_context():
     # db.drop_all() # resets tables between instances, do this if you change table models
     db.create_all()
