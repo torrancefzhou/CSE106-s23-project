@@ -87,7 +87,7 @@ with app.app_context():
     db.create_all()
 
 def can_access_admin_db():
-    return True  # to make new account after resetting DB
+    #return True  # to make new account after resetting DB
     return current_user.get_id() and current_user.is_admin
 
 class UserModelView(sqla.ModelView):
@@ -220,9 +220,7 @@ def comment_data(item):
 @app.route('/index')
 @app.route('/')
 def index(): # put application's code here
-    if current_user.is_authenticated and current_user.is_admin:
-        return render_template('admin_index.html')
-    elif current_user.is_authenticated:
+    if current_user.is_authenticated:
         return render_template('index.html', 
                                posts=[post_data(item) for item in Posts.query.all()], 
                                followed=[post_data(item) for item in get_followed_posts()])
