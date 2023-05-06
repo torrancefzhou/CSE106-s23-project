@@ -457,7 +457,7 @@ function follow_author(butt, reload = null) {
 
 function ratePost(butt) {
   var selected = butt.dataset.selected?.toLowerCase?.() === 'true';
-  var value = butt.dataset.value;
+  var value = parseInt(butt.dataset.value);
   var id = butt.dataset.id;
   var desire = selected ? 0 : value; // if voted, undo vote; if not voted, vote for the value
 
@@ -471,7 +471,7 @@ function ratePost(butt) {
     if (up.dataset.selected?.toLowerCase?.() === 'true') {
       oldRating = 1;
     }
-    else if (down.dataset.selected?.toLowerCase?.() === 'false') {
+    else if (down.dataset.selected?.toLowerCase?.() === 'true') {
       oldRating = 2;
     }
     up.classList.remove("highlight");
@@ -510,17 +510,24 @@ function ratePost(butt) {
 
 function rateComment(butt) {
   var selected = butt.dataset.selected?.toLowerCase?.() === 'true';
-  var value = butt.dataset.value;
+  var value = parseInt(butt.dataset.value);
   var id = butt.dataset.id;
   var desire = selected ? 0 : value; // if voted, undo vote; if not voted, vote for the value
 
-  fetch("/posts/" + id + "/rating/" + desire, {
+  fetch("/comments/" + id + "/rating/" + desire, {
     method: "POST"
   }).then((response) => response.json()).then((response) => {
-    let oldRating = butt.dataset.selected?.toLowerCase?.() === 'true' ? butt.dataset.value : 0;
     let newRating = response["rating"];
     let up = butt.parentNode.children[0];
     let down = butt.parentNode.children[1];
+    let oldRating = 0;
+    if (up.dataset.selected?.toLowerCase?.() === 'true') {
+      oldRating = 1;
+    }
+    else if (down.dataset.selected?.toLowerCase?.() === 'true') {
+      oldRating = 2;
+    }
+
     up.classList.remove("highlight");
     down.classList.remove("highlight");
     up.dataset.selected = down.dataset.selected = false;

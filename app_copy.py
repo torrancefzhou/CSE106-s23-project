@@ -214,8 +214,8 @@ def comment_data(item):
             "likes": item.likes,
             "dislikes": item.dislikes,
             "rating": 0 if not (current_user.is_authenticated and 
-                                Ratings.query.filter_by(post_id=item.id, user_id=current_user.id).first()) else 
-                Ratings.query.filter_by(post_id=item.id, user_id=current_user.id).first().rating}
+                                Ratings.query.filter_by(comment_id=item.id, user_id=current_user.id).first()) else 
+                Ratings.query.filter_by(comment_id=item.id, user_id=current_user.id).first().rating}
 
 @app.route('/index')
 @app.route('/')
@@ -337,36 +337,69 @@ def deleteComment(postID):
     else:
         return jsonify({'success': False})
     
-@app.route("/posts/<postID>/rating/<rating>", methods=['POST'])
+@app.route("/posts/<int:postID>/rating/<int:rating>", methods=['POST'])
 @login_required
 def ratePost(postID, rating):
     post = Posts.query.filter_by(id=postID).first()
     rate = Ratings.query.filter_by(user_id=current_user.id, post_id=post.id).first()
-    if rate and rating == 0:
-        db.session.delete(rating)
-        db.session.commit()
-    if rate and rate.rating != rating:
+    print(rate.rating, "->", rating)
+    if rate and rating == 0: # removing a rating
+        print("removing a rating")
+        if rate.rating == 1:
+            post.likes -= 1
+        elif rate.rating == 2:
+            post.dislikes -= 1
+        db.session.delete(rate)
+    elif rate and rate.rating != rating: # changing a rating
+        print("changing a rating")
         rate.rating = rating
-    elif not rate and rating != 0:
+        if rating == 1: # like, from dislike
+            post.likes += 1
+            post.dislikes -= 1
+        elif rating == 2: # dislike, from like
+            post.likes -= 1
+            post.dislikes += 1
+    elif not rate and rating != 0: # adding a rating
+        print("Adding a rating")
         newRating = Ratings(user_id=current_user.id, post_id=postID, rating=rating)
+        if rating == 1: # adding a like
+            post.likes += 1
+        elif rating == 2: # adding a dislike
+            post.dislikes += 1
         db.session.add(newRating)
-        db.session.commit()
+    db.session.commit()
+    print("+", post.likes, "-", post.dislikes)
     return jsonify({"rating": rating})
 
-@app.route("/posts/<postID>/<commentID>/rating/<rating>", methods=['POST'])
+@app.route("/comments/<int:commentID>/rating/<int:rating>", methods=['POST'])
 @login_required
-def rateComment(postID, commentID, rating):
+def rateComment(commentID, rating):
     comment = Comments.query.filter_by(id=commentID).first()
     rate = Ratings.query.filter_by(user_id=current_user.id, comment_id=comment.id).first()
-    if rate and rating == 0:
-        db.session.delete(rating)
-        db.session.commit()
-    if rate and rate.rating != rating:
+    print(rate.rating, "->", rating)
+    if rate and rating == 0: # removing a rating
+        if rate.rating == 1:
+            comment.likes -= 1
+        elif rate.rating == 2:
+            comment.dislikes -= 1
+        db.session.delete(rate)
+    elif rate and rate.rating != rating: # changing a rating
         rate.rating = rating
+        if rating == 1:
+            comment.likes += 1
+            comment.dislikes -= 1
+        elif rating == 2:
+            comment.likes -= 1
+            comment.dislikes += 1
     elif not rate and rating != 0:
         newRating = Ratings(user_id=current_user.id, comment_id=commentID, rating=rating)
+        if rating == 1:
+            comment.likes += 1
+        elif rating == 2:
+            comment.dislikes += 1
         db.session.add(newRating)
-        db.session.commit()
+    db.session.commit()
+    print(comment.likes, comment.dislikes)
     return jsonify({"rating": rating})
 
 
