@@ -455,3 +455,53 @@ function follow_author(butt, reload=null) {
     }
   });
 }
+
+function ratePost(butt) {
+  var selected = butt.dataset.selected?.toLowerCase?.() === 'true';
+  var value = butt.dataset.value;
+  var id = butt.dataset.id;
+  var desire = selected ? 0 : value; // if voted, undo vote; if not voted, vote for the value
+
+  fetch("/posts/" + id + "/rating/" + desire, {
+    method: "POST"
+  }).then((response) => response.json()).then((response) => {
+    let oldRating = butt.dataset.selected?.toLowerCase?.() === 'true' ? butt.dataset.value : 0;
+    let newRating = response["rating"];
+    let up = butt.parentNode.children[0];
+    let down = butt.parentNode.children[1];
+    up.classList.remove("highlight");
+    down.classList.remove("highlight");
+    up.dataset.selected = down.dataset.selected = false;
+
+    if (newRating == 0) {
+      if(oldRating == 1) {
+        up.children[1].innerHTML = parseInt(up.children[1].innerHTML) - 1;
+      }
+      else if (oldRating == 2) {
+        down.children[0].innerHTML = parseInt(down.children[0].innerHTML) - 1;
+      }
+    }
+    if (newRating == 1) {
+      up.classList.add("highlight");
+      up.dataset.selected = true;
+      if (oldRating == 0) {
+        up.children[1].innerHTML = parseInt(up.children[1].innerHTML) + 1;
+      }
+      else if (oldRating == 2) {
+        up.children[1].innerHTML = parseInt(up.children[1].innerHTML) + 1;
+        down.children[0].innerHTML = parseInt(down.children[0].innerHTML) - 1;
+      }
+    }
+    else if (newRating == 2) {
+      down.classList.add("highlight");
+      down.dataset.selected = true;
+      if(oldRating == 0) {
+        down.children[0].innerHTML = parseInt(down.children[0].innerHTML) + 1;
+      }
+      else if (oldRating == 1) {
+        up.children[1].innerHTML = parseInt(up.children[1].innerHTML) - 1;
+        down.children[0].innerHTML = parseInt(down.children[0].innerHTML) + 1;
+      }
+    }
+  });
+}

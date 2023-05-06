@@ -5,20 +5,42 @@
     </a>
     <div class="post_body">
         {{postInfo.body}}
-    </div> 
+    </div>
     <div class="post_footer">
-        <div class="post_rating">
-            <div class="post_upvote"><button onclick="addPostRating('{{postInfo.id}}' , 1)" type="button" class="button button1">Like</button><div class="likes">+{{postInfo.likes}}</div></div>
-            <div class="post_downvote"><div class="dislikes">-{{postInfo.dislikes}}</div><button onclick="addPostRating('{{postInfo.id}}' , 2)" type="button" class="button button2">Dislike</button></div>
+        <div class="post_rating ">
+            <div class="post_upvote {{'highlight' if postInfo.rating == 1}}" data-value="1"
+                data-selected="{{'true' if postInfo.rating == 1 else 'false'}}" data-id="{{postInfo.id}}"
+                onclick="ratePost(this);">
+                <button type="button" class="button button1">
+                    Like
+                </button>
+                <div class="likes">
+                    {{postInfo.likes}}
+                </div>
+            </div>
+            <div class="post_downvote {{'highlight' if postInfo.rating == 2}}" data-value="2"
+                data-selected="{{'true' if postInfo.rating == 2 else 'false'}}" data-id="{{postInfo.id}}"
+                onclick="ratePost(this);">
+                <div class="dislikes">
+                    {{postInfo.dislikes}}
+                </div>
+                <button type="button" class="button button2">
+                    Dislike
+                </button>
+            </div>
         </div>
-        <a href="/page/{{postInfo.id}}" class="post_comments"><div class="comments">View {{postInfo.comments}} comments</div></a>
-        <a href="/users/{{postInfo.poster}}" class="post_author"><div class="author">by: {{postInfo.poster}}</div></a>
-        <button class="follow_button" data-reload="{{request.url_rule.endpoint != 'postPage'}}" onclick="follow_author(this);"
-        data-author="{{postInfo.poster}}" data-following="{{postInfo.following}}">
+        <a href="/page/{{postInfo.id}}" class="post_comments">
+            <div class="comments">View {{postInfo.comments}} comments</div>
+        </a>
+        <a href="/users/{{postInfo.poster}}" class="post_author">
+            <div class="author">by: {{postInfo.poster}}</div>
+        </a>
+        <button class="follow_button" data-reload="{{request.url_rule.endpoint != 'postPage'}}"
+            onclick="follow_author(this);" data-author="{{postInfo.poster}}" data-following="{{postInfo.following}}">
             {% if postInfo.following %}
-                Following
-            {% else %} 
-                Follow
+            Following
+            {% else %}
+            Follow
             {% endif %}
         </button>
         <!-- TODO: dynamically change these buttons based on current status -->

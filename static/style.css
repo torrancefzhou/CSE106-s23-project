@@ -340,6 +340,7 @@ form.user_info_form {
 
 .post button, .comment button {
     display: inline-block;
+    cursor: pointer;
 }
 
 .post .post_title, .new_comment label {
@@ -382,16 +383,24 @@ form.user_info_form {
     display: inline-block;
     padding: .25rem;
     margin: 0;
+    cursor: pointer;
 }
 .post .post_downvote, .comment .comment_downvote {
     background-color:lightcoral;
     display: inline-block;
     padding: .25rem;
     margin: 0;
+    cursor: pointer;
 }
 .likes, .dislikes {
     display: inline-block;
     margin: 0 .25rem;
+}
+.likes::before {
+    content: "+";
+}
+.dislikes::before {
+    content: "-";
 }
 
 .new_comment {
@@ -419,4 +428,8 @@ form.user_info_form {
 
 .hidden {
     display: none;
+}
+
+.highlight {
+    box-shadow: 0 0 2px 2px rgba(0, 0, 0, .75);
 }
