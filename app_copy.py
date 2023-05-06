@@ -342,7 +342,6 @@ def deleteComment(postID):
 def ratePost(postID, rating):
     post = Posts.query.filter_by(id=postID).first()
     rate = Ratings.query.filter_by(user_id=current_user.id, post_id=post.id).first()
-    print(rate.rating, "->", rating)
     if rate and rating == 0: # removing a rating
         print("removing a rating")
         if rate.rating == 1:
@@ -368,7 +367,6 @@ def ratePost(postID, rating):
             post.dislikes += 1
         db.session.add(newRating)
     db.session.commit()
-    print("+", post.likes, "-", post.dislikes)
     return jsonify({"rating": rating})
 
 @app.route("/comments/<int:commentID>/rating/<int:rating>", methods=['POST'])
@@ -376,7 +374,6 @@ def ratePost(postID, rating):
 def rateComment(commentID, rating):
     comment = Comments.query.filter_by(id=commentID).first()
     rate = Ratings.query.filter_by(user_id=current_user.id, comment_id=comment.id).first()
-    print(rate.rating, "->", rating)
     if rate and rating == 0: # removing a rating
         if rate.rating == 1:
             comment.likes -= 1
@@ -399,7 +396,6 @@ def rateComment(commentID, rating):
             comment.dislikes += 1
         db.session.add(newRating)
     db.session.commit()
-    print(comment.likes, comment.dislikes)
     return jsonify({"rating": rating})
 
 
