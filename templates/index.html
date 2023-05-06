@@ -13,13 +13,19 @@
     <script src="{{ url_for('static',filename='script.js') }}"></script>
     <script>
         function showAllPosts() {
-            document.getElementById("all_posts").classList.remove("hidden");
+            var not_following = document.getElementsByClassName("not_following");
+            for (let i = 0; i < not_following.length; i++) {
+                not_following[i].classList.remove("hidden");
+            }
             document.getElementById("followed_posts").classList.add("hidden");
             document.getElementById("allHeader").classList.add("active");
             document.getElementById("followedHeader").classList.remove("active");
         }
         function showFollowedPosts() {
-            document.getElementById("all_posts").classList.add("hidden");
+            var not_following = document.getElementsByClassName("not_following");
+            for (let i = 0; i < not_following.length; i++) {
+                not_following[i].classList.add("hidden");
+            }
             document.getElementById("followed_posts").classList.remove("hidden");
             document.getElementById("allHeader").classList.remove("active");
             document.getElementById("followedHeader").classList.add("active");
@@ -37,9 +43,6 @@
             {% endfor %} 
         </div>
         <div id="followed_posts" class="hidden">
-            {% for postInfo in followed %}
-                {% include 'post.html' %}
-            {% endfor %}
             {% if not current_user.is_authenticated %}
                 <div style="padding: 1rem">You aren't logged in!</div>
             {% elif not followed %}

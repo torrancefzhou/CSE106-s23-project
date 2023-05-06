@@ -1,4 +1,4 @@
-<div class="post">
+<div class="post {{'following' if postInfo.following else 'not_following'}}">
     <script src="{{ url_for('static',filename='script.js') }}"></script>
     <a href="/page/{{postInfo.id}}" class="post_title">
         {{postInfo.title}}
