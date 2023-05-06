@@ -457,7 +457,7 @@ function follow_author(butt, reload = null) {
 
 function ratePost(butt) {
   var selected = butt.dataset.selected?.toLowerCase?.() === 'true';
-  var value = parseInt(butt.dataset.value);
+  var value = butt.dataset.value;
   var id = butt.dataset.id;
   var desire = selected ? 0 : value; // if voted, undo vote; if not voted, vote for the value
 
@@ -510,7 +510,7 @@ function ratePost(butt) {
 
 function rateComment(butt) {
   var selected = butt.dataset.selected?.toLowerCase?.() === 'true';
-  var value = parseInt(butt.dataset.value);
+  var value = butt.dataset.value;
   var id = butt.dataset.id;
   var desire = selected ? 0 : value; // if voted, undo vote; if not voted, vote for the value
 
