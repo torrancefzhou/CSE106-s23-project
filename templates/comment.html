@@ -1,4 +1,5 @@
 <div class="comment">
+    <script src="{{ url_for('static',filename='script.js') }}"></script>
     <a href="/users/{{commentInfo.commentor}}" class="comment_author">
         {{commentInfo.commentor}}
     </a>
@@ -8,12 +9,12 @@
     <div class="comment_footer">
         <div class="comment_rating">
             <div class="comment_upvote">
-                <button>Like</button>
+                <button onclick="addCommentRating('{{commentInfo.id}}' , 1)" type="button" class="button button1">Like</button>
                 +{{commentInfo.likes}}
             </div>
             <div class="comment_downvote">
                 -{{commentInfo.dislikes}}
-                <button>Dislike</button>
+                <button onclick="addCommentRating('{{commentInfo.id}}' , 2)" type="button" class="button button2">Dislike</button>
             </div>
         </div>
         <div class="filler"></div>

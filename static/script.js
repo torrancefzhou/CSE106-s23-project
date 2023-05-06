@@ -193,9 +193,9 @@ function editPostRating(postID, rating) {
 }
 
 
-function addCommentRating(postID, commentID, rating) {
+function addCommentRating(commentID, rating) {
   var xhttp = new XMLHttpRequest();
-  xhttp.open("POST", "/posts/" + postID + "/" + commentID + "/rating/" + rating);
+  xhttp.open("POST", "/posts/" + 1 + "/" + commentID + "/rating/" + rating);
   xhttp.send();
   xhttp.onload = function () {
     getPostbyID(postID)
