@@ -324,7 +324,7 @@ form.user_info_form {
     font-family: sans-serif;
 }
 
-.post, .comment, .new_comment {
+.post, .comment, .new_comment, .post_box {
     display: flex;
     flex-direction: column;
     width: calc(100% - 2rem);
@@ -403,7 +403,7 @@ form.user_info_form {
     content: "-";
 }
 
-.new_comment {
+.new_comment, .post_box input, .post_box textarea {
     box-sizing: border-box;
 }
 .new_comment label {

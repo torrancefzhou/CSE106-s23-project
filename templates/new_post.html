@@ -10,7 +10,8 @@
 <body>
     {% include 'header.html' %}
 
-    <h1>Make a new post!</h1>
+    <h1 style="text-align: center;">Make a new post!</h1>
+    <div class="post_box">
     <form action="/posts" method="POST" class="new_post">
         <label for="title">Title<br>
             <input type="text" placeholder="Enter title" name="title" id="title" required="">
@@ -20,6 +21,7 @@
         </label>
         <button type="submit">Post</button>
     </form>
+    </div>
 
     <script src="{{ url_for('static',filename='script.js') }}"></script>
 
