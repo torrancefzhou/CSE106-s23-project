@@ -160,7 +160,7 @@ function addPostRating(postID, rating) {
   xhttp.open("POST", "/posts/" + postID + "/rating/" + rating);
   xhttp.send();
   xhttp.onload = function () {
-    getAllPosts()
+    //getAllPosts()
   };
 }
 
