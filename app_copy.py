@@ -491,7 +491,6 @@ def new_post_page():
 @login_required
 def toggle_follow(username):
     desired_follow = request.json["now_following"]
-    print(username, request.json)
     followed = User.query.filter_by(username=username).first()
     if followed:
         follow_object = Followed.query.filter_by(user_id=current_user.id, followed_id=followed.id).first()

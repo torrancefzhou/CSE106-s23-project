@@ -423,7 +423,7 @@ function dropCourse(course) {
   xhttp.send();
 }
 
-function follow_author(butt) {
+function follow_author(butt, reload=null) {
   var author = butt.dataset.author;
   var following = butt.dataset.following?.toLowerCase?.() === 'true';
   fetch("/follow/" + butt.dataset.author, {
@@ -435,22 +435,23 @@ function follow_author(butt) {
       "now_following": !following
     }),
   }).then((response) => response.json()).then((response) => {
-    /*
-    var follow_buttons = document.getElementsByClassName("follow_button");
-    for (let i = 0; i < follow_buttons.length; i++) {
-      if (follow_buttons[i].dataset.author == author) {
-        let button = follow_buttons[i];
-        if (response["now_following"]) {
-          button.innerHTML = "Following";
-          button.dataset.following = true;
-        }
-        else {
-          button.innerHTML = "Follow";
-          button.dataset.following = false;
+    if(butt.dataset.reload?.toLowerCase?.() === 'true')
+      document.location.reload();
+    else {
+      var follow_buttons = document.getElementsByClassName("follow_button");
+      for (let i = 0; i < follow_buttons.length; i++) {
+        if (follow_buttons[i].dataset.author == author) {
+          let button = follow_buttons[i];
+          if (response["now_following"]) {
+            button.innerHTML = "Following";
+            button.dataset.following = true;
+          }
+          else {
+            button.innerHTML = "Follow";
+            button.dataset.following = false;
+          }
         }
       }
     }
-    */
-    document.location.reload();
   });
 }

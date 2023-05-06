@@ -17,7 +17,7 @@
             </div>
         </div>
         <div class="filler"></div>
-        <button class="follow_button" onclick="follow_author(this);" data-author="{{commentInfo.poster}}" data-following="{{postInfo.following}}">
+        <button class="follow_button" onclick="follow_author(this);" data-author="{{commentInfo.commentor}}" data-following="{{commentInfo.following}}">
             {% if commentInfo.following %}
                 Following
             {% else %} 
